@@ -644,95 +644,11 @@
     color: var(--accent);
   }
 
-  /* =========================================================
-     11. NOTIFICATIONS BELL + PANEL
-     ========================================================= */
-  .notification-wrap { position: fixed; top: 18px; right: 18px; z-index: 90; }
-  .notification-btn {
-    position: relative;
-    width: 46px;
-    height: 46px;
-    border: none;
-    border-radius: 50%;
-    background: var(--white);
-    font-size: 21px;
-    box-shadow: 0 5px 18px rgba(0, 0, 0, .15);
-    cursor: pointer;
-  }
-  .notification-btn:active { transform: scale(.92); }
-  .notification-dot {
-    display: none;
-    position: absolute;
-    top: 2px;
-    right: 2px;
-    width: 12px;
-    height: 12px;
-    border: 2px solid white;
-    border-radius: 50%;
-    background: #E8483D;
-  }
-  .notification-dot.show { display: block; }
-  .notification-panel {
-    display: none;
-    position: absolute;
-    top: 54px;
-    right: 0;
-    width: 310px;
-    max-width: calc(100vw - 36px);
-    max-height: 420px;
-    overflow-y: auto;
-    padding: 14px;
-    border-radius: 20px;
-    background: var(--white);
-    box-shadow: 0 12px 35px rgba(0, 0, 0, .18);
-  }
-  .notification-panel.show { display: block; }
-  .notification-header {
-    display: flex;
-    align-items: center;
-    justify-content: space-between;
-    margin-bottom: 10px;
-  }
-  .notification-header h3 { margin: 0; font-family: 'Baloo 2', cursive; font-size: 18px; color: var(--accent); }
-  .notification-clear {
-    border: none;
-    background: none;
-    font-family: 'Quicksand', sans-serif;
-    font-size: 11px;
-    color: var(--loose-text);
-    cursor: pointer;
-  }
-  .notification-item {
-    margin-bottom: 8px;
-    padding: 12px;
-    border-radius: 14px;
-    background: #FBF6F1;
-    text-align: left;
-  }
-  .notification-item.unread { border-left: 3px solid var(--accent); }
-  .notification-title { font-size: 13px; font-weight: 700; color: var(--brown); }
-  .notification-message { margin-top: 3px; font-size: 12px; line-height: 1.35; color: var(--loose-text); }
-  .notification-time { margin-top: 5px; font-size: 10px; color: var(--loose-text); opacity: .65; }
-  .notification-empty { padding: 25px 10px; font-size: 12px; text-align: center; color: var(--loose-text); }
 </style>
 </head>
 <body class="mood-happy">
 
 <div id="particle-layer"></div>
-
-<!-- Notifications bell + dropdown -->
-<div class="notification-wrap">
-  <button type="button" class="notification-btn" id="notificationBtn" aria-label="Notificações">
-    🔔<span class="notification-dot" id="notificationDot"></span>
-  </button>
-  <div class="notification-panel" id="notificationPanel">
-    <div class="notification-header">
-      <h3>Notificações 💕</h3>
-      <button type="button" class="notification-clear" id="notificationClear">Marcar todas como lidas</button>
-    </div>
-    <div id="notificationList"><div class="notification-empty">Carregando notificações...</div></div>
-  </div>
-</div>
 
 <!-- First-visit "eyes opening" intro animation -->
 <div id="intro-overlay">
@@ -848,7 +764,6 @@ const SUPABASE_URL = "https://uxuplzjsmoilzrobiflh.supabase.co";
 const SUPABASE_ANON_KEY = "sb_publishable_1mKkxDpM7WJvFm1xGVXxBA_5o1x6m9e";
 const supabase = createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
 
-const VAPID_PUBLIC_KEY = "BKwwnhtDwsB7A42rRnHID6qe1ZNLt4zBiKYftAcr-qGgU-8HZQfc121UhEJJF3AnNcnZvZxIsyVylauIWFjizWA";
 const GALLERY_BUCKET = 'gallery-photos';
 
 /* =========================================================
@@ -972,211 +887,10 @@ function applyMood(mood, opts = {}) {
     supabase.from('mood_state')
       .upsert({ user_id: myUserId, mood, updated_at: new Date().toISOString() })
       .then(() => {});
-    notifyPartner('Mudança de humor 💗', (myProfile && myProfile.display_name ? myProfile.display_name : 'Seu amor') + ' agora está se sentindo ' + (moodEmoji[mood] || '') + '!');
   }
 }
 
 moodButtons.forEach(btn => btn.addEventListener('click', () => applyMood(btn.dataset.mood)));
-
-/* =========================================================
-   NOTIFICATIONS (bell, panel, push)
-   ========================================================= */
-
-async function notifyPartner(title, message) {
-  try {
-    if (!myProfile || !myProfile.pair_id || !myUserId) return;
-
-    const { data: partner } = await supabase
-      .from('profiles')
-      .select('user_id, display_name')
-      .eq('pair_id', myProfile.pair_id)
-      .neq('user_id', myUserId)
-      .maybeSingle();
-
-    if (!partner) {
-      console.log('Parceiro ainda não encontrado.');
-      return;
-    }
-
-    const { error } = await supabase
-      .from('notifications')
-      .insert({
-        user_id: partner.user_id,
-        title: title,
-        message: message,
-        read: false
-      });
-
-    if (error) {
-      console.error('ERRO AO CRIAR NOTIFICAÇÃO:', error);
-      return;
-    }
-
-    console.log('Notificação enviada para:', partner.display_name);
-
-    // Também manda a notificação push de verdade pro celular do parceiro
-    // (a inserção acima só alimenta o sininho dentro do app).
-    try {
-      await supabase.functions.invoke('send-push', {
-        body: { target_user_id: partner.user_id, title, message, url: '/index.html' }
-      });
-    } catch (pushError) {
-      console.error('ERRO AO ENVIAR PUSH:', pushError);
-    }
-  } catch (error) {
-    console.error('ERRO AO NOTIFICAR PARCEIRO:', error);
-  }
-}
-
-const notificationBtn = document.getElementById('notificationBtn');
-const notificationPanel = document.getElementById('notificationPanel');
-const notificationDot = document.getElementById('notificationDot');
-const notificationList = document.getElementById('notificationList');
-const notificationClear = document.getElementById('notificationClear');
-
-function urlBase64ToUint8Array(base64String) {
-  const padding = "=".repeat((4 - base64String.length % 4) % 4);
-  const base64 = (base64String + padding).replace(/-/g, "+").replace(/_/g, "/");
-  const rawData = atob(base64);
-  return Uint8Array.from(Array.from(rawData).map(c => c.charCodeAt(0)));
-}
-
-async function enablePushNotifications() {
-  try {
-    if (!("Notification" in window) || !("serviceWorker" in navigator)) {
-      alert("Seu navegador não suporta notificações.");
-      return;
-    }
-
-    const permission = await Notification.requestPermission();
-    if (permission !== "granted") {
-      alert("Permissão para notificações não concedida.");
-      return;
-    }
-
-    const registration = await navigator.serviceWorker.register("/sw.js");
-    let subscription = await registration.pushManager.getSubscription();
-
-    if (!subscription) {
-      subscription = await registration.pushManager.subscribe({
-        userVisibleOnly: true,
-        applicationServerKey: urlBase64ToUint8Array(VAPID_PUBLIC_KEY)
-      });
-    }
-
-    const subscriptionJSON = subscription.toJSON();
-    const result = await supabase.from("push_subscriptions").upsert(
-      {
-        user_id: myUserId,
-        endpoint: subscriptionJSON.endpoint,
-        p256dh: subscriptionJSON.keys.p256dh,
-        auth: subscriptionJSON.keys.auth,
-        subscription: subscriptionJSON
-      },
-      { onConflict: "user_id" }
-    );
-
-    if (result.error) {
-      console.error("ERRO AO SALVAR INSCRIÇÃO:", result.error);
-      alert("Erro ao salvar a inscrição no Supabase.");
-      return;
-    }
-
-    alert("Notificações ativadas! 🔔💕");
-  } catch (error) {
-    console.error("Erro nas notificações:", error);
-    alert("Não foi possível ativar as notificações.");
-  }
-}
-
-const pushButton = document.createElement("button");
-pushButton.type = "button";
-pushButton.textContent = "🔔 Ativar notificações";
-pushButton.style.cssText = `
-  width: 100%;
-  margin: 10px 0;
-  padding: 11px;
-  border: none;
-  border-radius: 14px;
-  background: var(--accent);
-  color: white;
-  font-family: 'Baloo 2', cursive;
-  font-weight: 700;
-  font-size: 14px;
-  cursor: pointer;
-`;
-notificationPanel.prepend(pushButton);
-pushButton.addEventListener("click", enablePushNotifications);
-
-function notificationTime(value) {
-  const diff = Math.floor((Date.now() - new Date(value).getTime()) / 1000);
-  if (diff < 60) return 'agora';
-  const min = Math.floor(diff / 60);
-  if (min < 60) return 'há ' + min + (min === 1 ? ' minuto' : ' minutos');
-  const h = Math.floor(min / 60);
-  if (h < 24) return 'há ' + h + (h === 1 ? ' hora' : ' horas');
-  const d = Math.floor(h / 24);
-  return 'há ' + d + (d === 1 ? ' dia' : ' dias');
-}
-
-async function updateNotificationDot() {
-  if (!myUserId) return;
-  const r = await supabase.from('notifications').select('id').eq('user_id', myUserId).eq('read', false).limit(1);
-  if (!r.error) notificationDot.classList.toggle('show', !!(r.data && r.data.length));
-}
-
-async function loadNotifications() {
-  if (!myUserId) return;
-  notificationList.innerHTML = '<div class="notification-empty">Carregando notificações...</div>';
-
-  const r = await supabase.from('notifications').select('*').eq('user_id', myUserId).order('created_at', { ascending: false }).limit(50);
-  if (r.error) {
-    console.error('Erro ao carregar notificações:', r.error);
-    notificationList.innerHTML = '<div class="notification-empty">Não foi possível carregar 😢</div>';
-    return;
-  }
-
-  notificationList.innerHTML = '';
-  if (!r.data || !r.data.length) {
-    notificationList.innerHTML = '<div class="notification-empty">Nenhuma notificação ainda 💕</div>';
-    notificationDot.classList.remove('show');
-    return;
-  }
-
-  r.data.forEach(n => {
-    const item = document.createElement('div');
-    item.className = 'notification-item' + (n.read ? '' : ' unread');
-    item.innerHTML = '<div class="notification-title"></div><div class="notification-message"></div><div class="notification-time"></div>';
-    item.querySelector('.notification-title').textContent = n.title || 'Notificação';
-    item.querySelector('.notification-message').textContent = n.message || '';
-    item.querySelector('.notification-time').textContent = notificationTime(n.created_at);
-    item.addEventListener('click', async () => {
-      if (n.read) return;
-      const x = await supabase.from('notifications').update({ read: true }).eq('id', n.id).eq('user_id', myUserId);
-      if (!x.error) {
-        n.read = true;
-        item.classList.remove('unread');
-        await updateNotificationDot();
-      }
-    });
-    notificationList.appendChild(item);
-  });
-
-  await updateNotificationDot();
-}
-
-notificationBtn.addEventListener('click', async e => {
-  e.stopPropagation();
-  notificationPanel.classList.toggle('show');
-  if (notificationPanel.classList.contains('show')) await loadNotifications();
-});
-notificationPanel.addEventListener('click', e => e.stopPropagation());
-notificationClear.addEventListener('click', async () => {
-  if (!myUserId) return;
-  const r = await supabase.from('notifications').update({ read: true }).eq('user_id', myUserId).eq('read', false);
-  if (!r.error) await loadNotifications();
-});
-document.addEventListener('click', () => notificationPanel.classList.remove('show'));
 
 /* =========================================================
    PARTNER CARD / INVITE CARD
@@ -1322,7 +1036,6 @@ saveDateBtn.addEventListener('click', async () => {
   editDateBtn.style.display = '';
   updateDaysTogether(newDate);
   renderMilestones(newDate);
-  notifyPartner('Data alterada 💍', (myProfile && myProfile.display_name ? myProfile.display_name : 'Seu amor') + ' atualizou a data de vocês juntos.');
 });
 
 /* =========================================================
@@ -1490,7 +1203,6 @@ photoInput.addEventListener('change', async () => {
   const { data: signed } = await supabase.storage.from(GALLERY_BUCKET).createSignedUrl(path, 3600);
   if (signed) renderMedia(filename, signed.signedUrl, isVideo);
   setTimeout(() => galleryHint.textContent = '', 3000);
-  notifyPartner(isVideo ? 'Novo vídeo 🎥' : 'Nova memória 📸', (myProfile && myProfile.display_name ? myProfile.display_name : 'Seu amor') + (isVideo ? ' adicionou um vídeo novo à galeria!' : ' adicionou uma foto nova à galeria!'));
 });
 
 /* =========================================================
@@ -1583,7 +1295,6 @@ function playIntro(onDone) {
     applyMood(myMoodRow ? myMoodRow.mood : 'happy', { silent: true, deterministic: true, fromRemote: true });
     await refreshPartnerSection();
     await loadGallery();
-    await updateNotificationDot();
   });
 })();
 </script>

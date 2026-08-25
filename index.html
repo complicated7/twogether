@@ -595,6 +595,202 @@
     font-weight: 700;
   }
 
+  /* =========================================================
+     10b. RELATIONSHIP TIMELINE (moments)
+     ========================================================= */
+  .timeline { width: 100%; margin-top: 40px; }
+  .timeline h2 {
+    margin: 0 0 16px;
+    font-family: 'Baloo 2', cursive;
+    font-size: clamp(18px, 5vw, 22px);
+    color: var(--accent);
+  }
+  .moment-form {
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+    padding: 18px;
+    border-radius: 20px;
+    background: var(--white);
+    box-shadow: 0 8px 24px rgba(0, 0, 0, .08);
+    text-align: left;
+  }
+  .moment-field { display: flex; flex-direction: column; gap: 5px; }
+  .moment-field label {
+    font-size: 12.5px;
+    font-weight: 700;
+    color: var(--brown);
+  }
+  .moment-field input[type="text"],
+  .moment-field input[type="date"],
+  .moment-field input[type="time"],
+  .moment-field textarea,
+  .moment-field input[type="file"] {
+    padding: 10px 12px;
+    border: 1.5px solid #EADFD6;
+    border-radius: 12px;
+    background: #FBF6F1;
+    font-family: 'Quicksand', sans-serif;
+    font-size: 13.5px;
+    color: var(--brown);
+  }
+  .moment-field textarea { resize: vertical; min-height: 60px; }
+  .moment-field input:focus,
+  .moment-field textarea:focus { outline: 2px solid var(--accent); outline-offset: 1px; }
+  .moment-row { display: flex; gap: 12px; }
+  .moment-row .moment-field { flex: 1; }
+  .moment-save-btn {
+    margin-top: 4px;
+    padding: 12px;
+    border: none;
+    border-radius: 14px;
+    background: var(--accent);
+    color: #fff;
+    font-family: 'Baloo 2', cursive;
+    font-weight: 700;
+    font-size: 15px;
+    cursor: pointer;
+  }
+  .moment-save-btn:active { transform: scale(.98); }
+  .moment-save-btn:disabled { opacity: .6; pointer-events: none; }
+  .moment-hint { min-height: 14px; font-size: 11.5px; color: var(--loose-text); opacity: .85; }
+
+  .moment-list { display: flex; flex-direction: column; gap: 14px; margin-top: 22px; }
+  .moment-card {
+    display: flex;
+    gap: 14px;
+    padding: 14px;
+    border-radius: 18px;
+    background: var(--white);
+    box-shadow: 0 6px 18px rgba(0, 0, 0, .08);
+    text-align: left;
+    cursor: pointer;
+  }
+  .moment-card:active { transform: scale(.99); }
+  .moment-thumb {
+    flex: none;
+    position: relative;
+    width: 72px;
+    height: 72px;
+    border-radius: 14px;
+    overflow: hidden;
+    background: #FBF6F1;
+  }
+  .moment-thumb img,
+  .moment-thumb video { width: 100%; height: 100%; object-fit: cover; }
+  .moment-thumb .video-icon {
+    width: 30px;
+    height: 30px;
+    font-size: 14px;
+  }
+  .moment-thumb-empty {
+    width: 100%;
+    height: 100%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 22px;
+  }
+  .moment-body { flex: 1; min-width: 0; }
+  .moment-datetime {
+    font-size: 11px;
+    font-weight: 700;
+    color: var(--accent);
+    letter-spacing: .2px;
+  }
+  .moment-kind { margin-top: 2px; font-size: 10.5px; color: var(--loose-text); opacity: .75; }
+  .moment-title {
+    margin-top: 4px;
+    font-family: 'Baloo 2', cursive;
+    font-size: 15.5px;
+    color: var(--brown);
+  }
+  .moment-desc {
+    margin-top: 3px;
+    font-size: 12.5px;
+    line-height: 1.4;
+    color: var(--loose-text);
+    display: -webkit-box;
+    -webkit-line-clamp: 2;
+    -webkit-box-orient: vertical;
+    overflow: hidden;
+  }
+  .moment-empty {
+    padding: 24px 10px;
+    text-align: center;
+    font-size: 12.5px;
+    color: var(--loose-text);
+  }
+
+  /* moment detail overlay */
+  .moment-overlay {
+    position: fixed;
+    inset: 0;
+    z-index: 100;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 24px;
+    background: rgba(20, 14, 12, .86);
+    opacity: 0;
+    pointer-events: none;
+    transition: opacity .25s ease;
+  }
+  .moment-overlay.show { opacity: 1; pointer-events: auto; }
+  .moment-overlay-card {
+    width: 100%;
+    max-width: 380px;
+    max-height: 88vh;
+    overflow-y: auto;
+    border-radius: 22px;
+    background: var(--white);
+    box-shadow: 0 20px 50px rgba(0, 0, 0, .4);
+    text-align: left;
+  }
+  .moment-overlay-media { width: 100%; max-height: 260px; background: #000; }
+  .moment-overlay-media img,
+  .moment-overlay-media video { width: 100%; max-height: 260px; object-fit: contain; display: block; background: #000; }
+  .moment-overlay-body { padding: 20px; }
+  .moment-overlay-close {
+    position: absolute;
+    top: 18px;
+    right: 18px;
+    z-index: 3;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 38px;
+    height: 38px;
+    border: none;
+    border-radius: 50%;
+    background: rgba(255, 255, 255, .92);
+    color: var(--brown);
+    font-size: 17px;
+    cursor: pointer;
+  }
+  .moment-overlay-facts {
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+    margin-bottom: 14px;
+    padding-bottom: 14px;
+    border-bottom: 1.5px dashed #EADFD6;
+  }
+  .moment-overlay-fact { font-size: 13px; color: var(--brown); }
+  .moment-overlay-fact.ago { font-weight: 700; color: var(--accent); }
+  .moment-overlay-title {
+    font-family: 'Baloo 2', cursive;
+    font-size: 19px;
+    color: var(--brown);
+  }
+  .moment-overlay-desc {
+    margin-top: 8px;
+    font-size: 13.5px;
+    line-height: 1.5;
+    color: var(--loose-text);
+    white-space: pre-wrap;
+  }
+
   /* fullscreen photo/video viewer */
   .lightbox {
     position: fixed;
@@ -740,6 +936,59 @@
     <input type="file" id="photoInput" accept="image/*,video/*" style="display:none">
     <p class="gallery-hint" id="galleryHint"></p>
   </section>
+
+  <section class="timeline">
+    <h2>📖 Nossa Linha do Tempo</h2>
+
+    <form class="moment-form" id="momentForm">
+      <div class="moment-field">
+        <label for="momentFile">📷🎥 Foto ou vídeo (opcional)</label>
+        <input type="file" id="momentFile" accept="image/*,video/*">
+      </div>
+
+      <div class="moment-row">
+        <div class="moment-field">
+          <label for="momentDate">📅 Quando aconteceu?</label>
+          <input type="date" id="momentDate" required>
+        </div>
+        <div class="moment-field">
+          <label for="momentTime">⏰ Que horas?</label>
+          <input type="time" id="momentTime" required>
+        </div>
+      </div>
+
+      <div class="moment-field">
+        <label for="momentTitle">✨ O que aconteceu?</label>
+        <input type="text" id="momentTitle" placeholder="ex: o dia em que te pedi em namoro..." required maxlength="120">
+      </div>
+
+      <div class="moment-field">
+        <label for="momentDesc">📝 Conte mais sobre esse momento (opcional)</label>
+        <textarea id="momentDesc" placeholder="ex: eu tava morrendo de nervoso, mas foi um dos melhores dias da minha vida" maxlength="600"></textarea>
+      </div>
+
+      <button type="submit" class="moment-save-btn" id="momentSaveBtn">💾 Salvar momento</button>
+      <p class="moment-hint" id="momentHint"></p>
+    </form>
+
+    <div class="moment-list" id="momentList"></div>
+  </section>
+
+  <div class="moment-overlay" id="momentOverlay">
+    <div class="moment-overlay-card">
+      <button type="button" class="moment-overlay-close" id="momentOverlayClose" aria-label="Fechar">✕</button>
+      <div class="moment-overlay-media" id="momentOverlayMedia" style="display:none"></div>
+      <div class="moment-overlay-body">
+        <div class="moment-overlay-facts">
+          <div class="moment-overlay-fact" id="momentOverlayDate">📅 </div>
+          <div class="moment-overlay-fact" id="momentOverlayTime">⏰ </div>
+          <div class="moment-overlay-fact ago" id="momentOverlayAgo">💗 </div>
+        </div>
+        <div class="moment-overlay-title" id="momentOverlayTitle"></div>
+        <div class="moment-overlay-desc" id="momentOverlayDesc"></div>
+      </div>
+    </div>
+  </div>
 
   <div class="lightbox" id="lightbox">
     <button type="button" class="lightbox-close" id="lightboxClose" aria-label="Fechar">✕</button>
@@ -1206,6 +1455,280 @@ photoInput.addEventListener('change', async () => {
 });
 
 /* =========================================================
+   RELATIONSHIP TIMELINE (moments)
+   ========================================================= */
+const MOMENTS_TABLE = 'moments';
+const MOMENTS_FOLDER = 'moments';
+
+const momentForm = document.getElementById('momentForm');
+const momentFile = document.getElementById('momentFile');
+const momentDate = document.getElementById('momentDate');
+const momentTime = document.getElementById('momentTime');
+const momentTitle = document.getElementById('momentTitle');
+const momentDesc = document.getElementById('momentDesc');
+const momentSaveBtn = document.getElementById('momentSaveBtn');
+const momentHint = document.getElementById('momentHint');
+const momentList = document.getElementById('momentList');
+
+const momentOverlay = document.getElementById('momentOverlay');
+const momentOverlayClose = document.getElementById('momentOverlayClose');
+const momentOverlayMedia = document.getElementById('momentOverlayMedia');
+const momentOverlayDate = document.getElementById('momentOverlayDate');
+const momentOverlayTime = document.getElementById('momentOverlayTime');
+const momentOverlayAgo = document.getElementById('momentOverlayAgo');
+const momentOverlayTitle = document.getElementById('momentOverlayTitle');
+const momentOverlayDesc = document.getElementById('momentOverlayDesc');
+
+const MONTHS_PT = ['janeiro', 'fevereiro', 'março', 'abril', 'maio', 'junho', 'julho', 'agosto', 'setembro', 'outubro', 'novembro', 'dezembro'];
+
+function formatMomentDateLong(d) {
+  return d.getDate() + ' de ' + MONTHS_PT[d.getMonth()] + ' de ' + d.getFullYear();
+}
+
+function formatMomentTime(d) {
+  return String(d.getHours()).padStart(2, '0') + ':' + String(d.getMinutes()).padStart(2, '0');
+}
+
+// "há 1 ano, 2 meses e 3 dias" style relative time, calendar-based
+// (not a fixed 30-day month) so it stays accurate for any date.
+function formatTimeAgo(pastDate) {
+  const now = new Date();
+  if (pastDate > now) return 'em breve 💫';
+
+  let years = now.getFullYear() - pastDate.getFullYear();
+  let months = now.getMonth() - pastDate.getMonth();
+  let days = now.getDate() - pastDate.getDate();
+
+  if (days < 0) {
+    months -= 1;
+    const prevMonth = new Date(now.getFullYear(), now.getMonth(), 0);
+    days += prevMonth.getDate();
+  }
+  if (months < 0) {
+    years -= 1;
+    months += 12;
+  }
+
+  const parts = [];
+  if (years > 0) parts.push(years + (years === 1 ? ' ano' : ' anos'));
+  if (months > 0) parts.push(months + (months === 1 ? ' mês' : ' meses'));
+  if (days > 0 || parts.length === 0) parts.push(days + (days === 1 ? ' dia' : ' dias'));
+
+  let joined;
+  if (parts.length === 1) joined = parts[0];
+  else joined = parts.slice(0, -1).join(', ') + ' e ' + parts[parts.length - 1];
+
+  return 'há ' + joined;
+}
+
+function momentMediaUrlFromPath(path) {
+  return supabase.storage.from(GALLERY_BUCKET).createSignedUrl(path, 3600);
+}
+
+function openMomentOverlay(moment, mediaUrl) {
+  const happened = new Date(moment.happened_at);
+
+  momentOverlayDate.textContent = '📅 ' + formatMomentDateLong(happened);
+  momentOverlayTime.textContent = '⏰ ' + formatMomentTime(happened);
+  momentOverlayAgo.textContent = '💗 ' + formatTimeAgo(happened);
+  momentOverlayTitle.textContent = moment.title;
+  momentOverlayDesc.textContent = moment.description || '';
+  momentOverlayDesc.style.display = moment.description ? '' : 'none';
+
+  momentOverlayMedia.innerHTML = '';
+  if (mediaUrl) {
+    momentOverlayMedia.style.display = '';
+    if (moment.media_type === 'video') {
+      const video = document.createElement('video');
+      video.src = mediaUrl;
+      video.controls = true;
+      video.playsInline = true;
+      momentOverlayMedia.appendChild(video);
+    } else {
+      const img = document.createElement('img');
+      img.src = mediaUrl;
+      img.alt = moment.title;
+      momentOverlayMedia.appendChild(img);
+    }
+  } else {
+    momentOverlayMedia.style.display = 'none';
+  }
+
+  momentOverlay.classList.add('show');
+}
+
+function closeMomentOverlay() {
+  const video = momentOverlayMedia.querySelector('video');
+  if (video) video.pause();
+  momentOverlay.classList.remove('show');
+}
+
+momentOverlayClose.addEventListener('click', closeMomentOverlay);
+momentOverlay.addEventListener('click', e => { if (e.target === momentOverlay) closeMomentOverlay(); });
+
+async function renderMomentCard(moment) {
+  const happened = new Date(moment.happened_at);
+
+  const card = document.createElement('div');
+  card.className = 'moment-card';
+
+  const thumb = document.createElement('div');
+  thumb.className = 'moment-thumb';
+
+  let mediaUrl = null;
+  if (moment.media_path) {
+    const { data: signed } = await momentMediaUrlFromPath(moment.media_path);
+    mediaUrl = signed ? signed.signedUrl : null;
+  }
+
+  if (mediaUrl && moment.media_type === 'video') {
+    const video = document.createElement('video');
+    video.src = mediaUrl;
+    video.muted = true;
+    video.playsInline = true;
+    video.preload = 'metadata';
+    video.addEventListener('loadedmetadata', () => { try { video.currentTime = .01; } catch (e) {} });
+    thumb.appendChild(video);
+    const icon = document.createElement('span');
+    icon.className = 'video-icon';
+    icon.textContent = '▶';
+    thumb.appendChild(icon);
+  } else if (mediaUrl) {
+    const img = document.createElement('img');
+    img.src = mediaUrl;
+    img.alt = moment.title;
+    img.loading = 'lazy';
+    thumb.appendChild(img);
+  } else {
+    const placeholder = document.createElement('div');
+    placeholder.className = 'moment-thumb-empty';
+    placeholder.textContent = '💌';
+    thumb.appendChild(placeholder);
+  }
+
+  const body = document.createElement('div');
+  body.className = 'moment-body';
+  body.innerHTML =
+    '<div class="moment-datetime"></div>' +
+    '<div class="moment-kind"></div>' +
+    '<div class="moment-title"></div>' +
+    (moment.description ? '<div class="moment-desc"></div>' : '');
+
+  body.querySelector('.moment-datetime').textContent =
+    '📅 ' + formatMomentDateLong(happened) + ' • ⏰ ' + formatMomentTime(happened);
+  body.querySelector('.moment-kind').textContent =
+    moment.media_type === 'video' ? '🎥 vídeo' : (moment.media_type === 'image' ? '📸 foto' : '💭 memória');
+  body.querySelector('.moment-title').textContent = moment.title;
+  if (moment.description) body.querySelector('.moment-desc').textContent = moment.description;
+
+  card.appendChild(thumb);
+  card.appendChild(body);
+  card.addEventListener('click', () => openMomentOverlay(moment, mediaUrl));
+
+  momentList.appendChild(card);
+}
+
+async function loadMoments() {
+  momentList.innerHTML = '<div class="moment-empty">Carregando linha do tempo... 💭</div>';
+
+  const { data, error } = await supabase
+    .from(MOMENTS_TABLE)
+    .select('*')
+    .order('happened_at', { ascending: false });
+
+  if (error) {
+    console.error('ERRO AO CARREGAR MOMENTOS:', error);
+    momentList.innerHTML = '<div class="moment-empty">Não foi possível carregar 😢</div>';
+    return;
+  }
+
+  momentList.innerHTML = '';
+  if (!data || !data.length) {
+    momentList.innerHTML = '<div class="moment-empty">Nenhum momento ainda — que tal adicionar o primeiro? 💕</div>';
+    return;
+  }
+
+  for (const moment of data) {
+    await renderMomentCard(moment);
+  }
+}
+
+momentForm.addEventListener('submit', async e => {
+  e.preventDefault();
+  if (!myProfile || !myProfile.pair_id || !myUserId) return;
+
+  const dateVal = momentDate.value;
+  const timeVal = momentTime.value;
+  const titleVal = momentTitle.value.trim();
+  const descVal = momentDesc.value.trim();
+  const file = momentFile.files && momentFile.files[0];
+
+  if (!dateVal || !timeVal || !titleVal) {
+    momentHint.textContent = 'Preencha a data, a hora e o que aconteceu 💭';
+    return;
+  }
+
+  let mediaType = null;
+  if (file) {
+    const isImage = file.type.indexOf('image/') === 0;
+    const isVideo = file.type.indexOf('video/') === 0;
+    if (!isImage && !isVideo) {
+      momentHint.textContent = 'Escolha uma foto ou vídeo 💭';
+      return;
+    }
+    const maxSize = isVideo ? 100 * 1024 * 1024 : 10 * 1024 * 1024;
+    if (file.size > maxSize) {
+      momentHint.textContent = isVideo ? 'Esse vídeo é grande demais (máx. 100 MB) 💭' : 'Essa foto é grande demais (máx. 10 MB) 💭';
+      return;
+    }
+    mediaType = isVideo ? 'video' : 'image';
+  }
+
+  momentSaveBtn.disabled = true;
+  momentHint.textContent = 'Salvando esse momento... 💾';
+
+  let mediaPath = null;
+  if (file) {
+    const ext = (file.name.split('.').pop() || (mediaType === 'video' ? 'mp4' : 'jpg')).toLowerCase().replace(/[^a-z0-9]/g, '') || (mediaType === 'video' ? 'mp4' : 'jpg');
+    const filename = Date.now() + '-' + Math.random().toString(36).slice(2, 8) + '.' + ext;
+    mediaPath = myProfile.pair_id + '/' + MOMENTS_FOLDER + '/' + filename;
+
+    const { error: uploadError } = await supabase.storage.from(GALLERY_BUCKET).upload(mediaPath, file, { contentType: file.type || undefined });
+    if (uploadError) {
+      console.error('ERRO NO UPLOAD DO MOMENTO:', uploadError);
+      momentHint.textContent = uploadError.message || 'Erro ao enviar o arquivo';
+      momentSaveBtn.disabled = false;
+      return;
+    }
+  }
+
+  const happenedAt = new Date(dateVal + 'T' + timeVal + ':00');
+
+  const { error } = await supabase.from(MOMENTS_TABLE).insert({
+    pair_id: myProfile.pair_id,
+    author_id: myUserId,
+    title: titleVal,
+    description: descVal || null,
+    media_path: mediaPath,
+    media_type: mediaType,
+    happened_at: happenedAt.toISOString()
+  });
+
+  momentSaveBtn.disabled = false;
+
+  if (error) {
+    console.error('ERRO AO SALVAR MOMENTO:', error);
+    momentHint.textContent = 'Não foi possível salvar — tente novamente 🥺';
+    return;
+  }
+
+  momentHint.textContent = 'Momento salvo! 💕';
+  momentForm.reset();
+  setTimeout(() => momentHint.textContent = '', 3000);
+  await loadMoments();
+});
+
+/* =========================================================
    LOGOUT
    ========================================================= */
 document.getElementById('logoutLink').addEventListener('click', async () => {
@@ -1295,6 +1818,7 @@ function playIntro(onDone) {
     applyMood(myMoodRow ? myMoodRow.mood : 'happy', { silent: true, deterministic: true, fromRemote: true });
     await refreshPartnerSection();
     await loadGallery();
+    await loadMoments();
   });
 })();
 </script>

@@ -1,0 +1,224 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+<title>Twogether — Sign In</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Baloo+2:wght@500;600;700;800&family=Quicksand:wght@400;500;600;700&display=swap" rel="stylesheet">
+<script
+  src="https://browser.sentry-cdn.com/10.67.0/bundle.min.js"
+  integrity="sha384-XcUJj5iqu49IW8uRaR1JR5XT+Hri4IQkCDLt1Ek9li1Qby2ef+35Ur6/7QXwh1VF"
+  crossorigin="anonymous"
+></script>
+<script>
+  Sentry.init({ dsn: "https://d22229fe31d1c4d9683482cb0cb69231@o4511733518172160.ingest.us.sentry.io/4511768120000512" });
+</script>
+<style>
+  :root{ --white:#FFFFFF; --brown:#4A3B33; --ink:#2B2320; --bg-top:#FDF1E6; --bg-bottom:#FBE4D0; --loose-text:#7A6459; --accent:#FF8FA8; }
+  *{ box-sizing:border-box; -webkit-tap-highlight-color:transparent; }
+  html, body{ margin:0; padding:0; min-height:100%; }
+  body{
+    background: linear-gradient(180deg, var(--bg-top) 0%, var(--bg-bottom) 100%);
+    font-family:'Quicksand', sans-serif; color:var(--brown);
+    display:flex; justify-content:center; align-items:flex-start;
+    min-height:100vh; position:relative; overflow-x:hidden;
+  }
+  body::before{
+    content:""; position:fixed; inset:0; z-index:0; pointer-events:none;
+    background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='120' height='120'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='2' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)' opacity='0.35'/%3E%3C/svg%3E");
+    opacity:0.05; mix-blend-mode:multiply;
+  }
+  body::after{
+    content:""; position:fixed; inset:0; z-index:0; pointer-events:none;
+    box-shadow: inset 0 0 140px rgba(60,40,30,0.12);
+  }
+
+  .card{
+    position:relative; z-index:1; width:100%; max-width:380px; margin:8vh 20px;
+    background:var(--white); border-radius:26px; padding:32px 26px;
+    box-shadow:0 20px 50px rgba(0,0,0,0.12);
+  }
+  .home-kicker{
+    font-size:11px; font-weight:700; letter-spacing:1.5px; text-transform:uppercase;
+    color:var(--loose-text); opacity:0.75; margin:0 0 4px; text-align:center;
+  }
+  h1{ font-family:'Baloo 2',cursive; font-size:26px; color:var(--accent); margin:0 0 4px; text-align:center; }
+  .sub{ text-align:center; font-size:13px; color:var(--loose-text); margin:0 0 24px; }
+
+  .tabs{ display:flex; background:#F5EDE6; border-radius:999px; padding:4px; margin-bottom:20px; }
+  .tab{
+    flex:1; text-align:center; padding:9px 0; border-radius:999px; cursor:pointer;
+    font-family:'Baloo 2',cursive; font-weight:600; font-size:14px; color:var(--loose-text);
+    transition: background .2s ease, color .2s ease;
+  }
+  .tab.active{ background:var(--white); color:var(--accent); box-shadow:0 3px 8px rgba(0,0,0,0.08); }
+
+  form{ display:none; flex-direction:column; gap:12px; }
+  form.active{ display:flex; }
+
+  label{ font-size:12.5px; font-weight:700; color:var(--loose-text); margin-bottom:-6px; }
+  input{
+    width:100%; padding:11px 14px; border-radius:12px; border:2px solid #EFE3DA;
+    font-family:'Quicksand',sans-serif; font-size:14px; color:var(--brown); background:#FBF6F1;
+  }
+  input:focus{ outline:none; border-color:var(--accent); }
+
+  .invite-hint{ font-size:11.5px; color:var(--loose-text); opacity:0.8; margin-top:-6px; }
+
+  button[type="submit"]{
+    margin-top:6px; padding:12px; border:none; border-radius:999px; cursor:pointer;
+    background:#E9D7CD; color:#fff; font-family:'Baloo 2',cursive; font-weight:700; font-size:15px;
+    transition: transform .15s ease, opacity .2s ease, background .25s ease, box-shadow .25s ease;
+  }
+  button[type="submit"].ready{
+    background:var(--accent);
+    box-shadow:0 8px 20px rgba(255,143,168,0.5);
+  }
+  button[type="submit"]:active{ transform:scale(0.97); }
+  button[type="submit"]:disabled{ opacity:0.6; cursor:default; }
+
+  .msg{ min-height:16px; font-size:12.5px; text-align:center; margin-top:10px; color:var(--loose-text); }
+  .msg.error{ color:#E8483D; font-weight:700; }
+  .msg.success{ color:#3AA76D; font-weight:700; }
+</style>
+</head>
+<body>
+
+<div class="card">
+  <p class="home-kicker">💞 twogether</p>
+  <h1>Twogether</h1>
+  <p class="sub">Um mundinho de Lucas e Izabelli</p>
+
+  <div class="tabs">
+    <div class="tab active" id="tabLogin">Login</div>
+    <div class="tab" id="tabSignup">Cadastrar-se</div>
+  </div>
+
+  <form id="loginForm" class="active">
+    <label for="loginEmail">Email</label>
+    <input type="email" id="loginEmail" autocomplete="email" required>
+    <label for="loginPassword">Senha</label>
+    <input type="password" id="loginPassword" autocomplete="current-password" required>
+    <button type="submit" id="loginSubmit">Login</button>
+  </form>
+
+  <form id="signupForm">
+    <label for="signupName">Seu nome</label>
+    <input type="text" id="signupName" placeholder="ex: Lucas" autocomplete="given-name" required>
+    <label for="signupEmail">Email</label>
+    <input type="email" id="signupEmail" autocomplete="email" required>
+    <label for="signupPassword">Senha</label>
+    <input type="password" id="signupPassword" autocomplete="new-password" minlength="6" required>
+    <label for="signupCode">Código de convite <span style="font-weight:500;">(opcional)</span></label>
+    <input type="text" id="signupCode" placeholder="do seu parceiro, caso você tenha um" maxlength="6" style="text-transform:uppercase;">
+    <p class="invite-hint">Deixe em branco para começar uma nova dupla — depois de se cadastrar, você receberá um código para compartilhar com seu parceiro.</p>
+    <button type="submit" id="signupSubmit">Cadastrar-se</button>
+  </form>
+
+  <p class="msg" id="msg"></p>
+</div>
+
+<script type="module">
+  import { createClient } from 'https://esm.sh/@supabase/supabase-js@2';
+
+  var SUPABASE_URL = "https://uxuplzjsmoilzrobiflh.supabase.co";
+  var SUPABASE_ANON_KEY = "sb_publishable_1mKkxDpM7WJvFm1xGVXxBA_5o1x6m9e";
+  var supabase = createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+  window.__supabase = supabase;
+
+  var tabLogin = document.getElementById('tabLogin');
+  var tabSignup = document.getElementById('tabSignup');
+  var loginForm = document.getElementById('loginForm');
+  var signupForm = document.getElementById('signupForm');
+  var msg = document.getElementById('msg');
+
+  
+  function setMsg(text, type){
+    msg.textContent = text || '';
+    msg.className = 'msg' + (type ? ' ' + type : '');
+  }
+
+  function showTab(which){
+    var isLogin = which === 'login';
+    tabLogin.classList.toggle('active', isLogin);
+    tabSignup.classList.toggle('active', !isLogin);
+    loginForm.classList.toggle('active', isLogin);
+    signupForm.classList.toggle('active', !isLogin);
+    setMsg('');
+  }
+
+  function wireReadyState(form, submitBtn){
+    function update(){ submitBtn.classList.toggle('ready', form.checkValidity()); }
+    form.addEventListener('input', update);
+    update();
+  }
+  wireReadyState(loginForm, document.getElementById('loginSubmit'));
+  wireReadyState(signupForm, document.getElementById('signupSubmit'));
+  tabLogin.addEventListener('click', function(){ showTab('login'); });
+  tabSignup.addEventListener('click', function(){ showTab('signup'); });
+
+  (async function redirectIfLoggedIn(){
+    var { data } = await supabase.auth.getSession();
+    if (data && data.session){ window.location.href = 'index.html'; }
+  })();
+
+  loginForm.addEventListener('submit', async function(e){
+    e.preventDefault();
+    var email = document.getElementById('loginEmail').value.trim();
+    var password = document.getElementById('loginPassword').value;
+    var submitBtn = document.getElementById('loginSubmit');
+    submitBtn.disabled = true;
+    setMsg('Entrando...');
+
+    var { error } = await supabase.auth.signInWithPassword({ email: email, password: password });
+    if (error){
+      setMsg(error.message, 'error');
+      submitBtn.disabled = false;
+      return;
+    }
+    setMsg('Bem-vindo(a) de volta 💕', 'success');
+    window.location.href = 'index.html';
+  });
+
+  signupForm.addEventListener('submit', async function(e){
+    e.preventDefault();
+    var displayName = document.getElementById('signupName').value.trim();
+    var email = document.getElementById('signupEmail').value.trim();
+    var password = document.getElementById('signupPassword').value;
+    var code = document.getElementById('signupCode').value.trim();
+    var submitBtn = document.getElementById('signupSubmit');
+    submitBtn.disabled = true;
+    setMsg('Criando sua conta...');
+
+    var { data: signUpData, error: signUpError } = await supabase.auth.signUp({ email: email, password: password });
+    if (signUpError){
+      setMsg(signUpError.message, 'erro');
+      submitBtn.disabled = false;
+      return;
+    }
+
+    if (!signUpData.session){
+      setMsg('Verifique seu e-mail para confirmar sua conta e, depois, faça login.', 'sucesso');
+      submitBtn.disabled = false;
+      return;
+    }
+
+    var { data: pairId, error: pairError } = await supabase.rpc('create_or_join_pair', {
+      p_display_name: displayName,
+      p_invite_code: code || null
+    });
+    if (pairError){
+      setMsg(pairError.message, 'erro');
+      submitBtn.disabled = false;
+      return;
+    }
+
+    setMsg('Você entrou 💕 Levando você para a página inicial...', 'sucesso');
+    window.location.href = 'index.html';
+  });
+</script>
+
+</body>
+</html>

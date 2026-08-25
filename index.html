@@ -1,0 +1,1591 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+<title>Twogether 👀💕</title>
+
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Baloo+2:wght@500;600;700;800&family=Quicksand:wght@400;500;600;700&display=swap" rel="stylesheet">
+
+<script src="https://browser.sentry-cdn.com/10.67.0/bundle.min.js"
+  integrity="sha384-XcUJj5iqu49IW8uRaR1JR5XT+Hri4IQkCDLt1Ek9li1Qby2ef+35Ur6/7QXwh1VF"
+  crossorigin="anonymous"></script>
+<script>
+  Sentry.init({ dsn: "https://d22229fe31d1c4d9683482cb0cb69231@o4511733518172160.ingest.us.sentry.io/4511768120000512" });
+</script>
+
+<script>
+  // Skip the eye-opening intro animation if the user has already seen it this browser.
+  if (localStorage.getItem('monthsaryIntroSeen') === '1') {
+    document.documentElement.classList.add('skip-intro');
+  }
+</script>
+
+<style>
+  /* =========================================================
+     1. THEME / MOOD COLOR PALETTES
+     Each mood swaps these CSS variables on <body class="mood-X">
+     ========================================================= */
+  :root {
+    --white: #FFF;
+    --brown: #4A3B33;
+    --ink: #2B2320;
+  }
+  body.mood-happy    { --bg-top: #FDF1E6; --bg-bottom: #FBE4D0; --loose-text: #7A6459; --accent: #FF8FA8; }
+  body.mood-tired    { --bg-top: #EDE7F6; --bg-bottom: #D9CFEA; --loose-text: #6B6079; --accent: #9C8FC2; }
+  body.mood-sad      { --bg-top: #E3EEF9; --bg-bottom: #C9DFF0; --loose-text: #5C7288; --accent: #6FA3D1; }
+  body.mood-mad      { --bg-top: #FFE0D2; --bg-bottom: #FFB99F; --loose-text: #8A4A36; --accent: #FF6B4A; }
+  body.mood-hungry   { --bg-top: #FFF3D6; --bg-bottom: #FFDFA0; --loose-text: #8A6A2C; --accent: #FFA83D; }
+  body.mood-sleepy   { --bg-top: #3A3560; --bg-bottom: #22203E; --loose-text: #CFC9EA; --accent: #9E90D8; }
+  body.mood-excited  { --bg-top: #FFEE9E; --bg-bottom: #FFB3DE; --loose-text: #8A5A72; --accent: #FF5FA8; }
+  body.mood-naughty  { --bg-top: #F1DFFF; --bg-bottom: #FFCCEB; --loose-text: #7A4F8A; --accent: #C463D9; }
+
+  /* =========================================================
+     2. BASE / RESET
+     ========================================================= */
+  * {
+    box-sizing: border-box;
+    -webkit-tap-highlight-color: transparent;
+  }
+  html, body {
+    margin: 0;
+    padding: 0;
+    min-height: 100%;
+  }
+  html.intro-lock,
+  html.intro-lock body {
+    overflow: hidden;
+  }
+  body {
+    display: flex;
+    justify-content: center;
+    position: relative;
+    min-height: 100vh;
+    overflow-x: hidden;
+    background: linear-gradient(180deg, var(--bg-top) 0%, var(--bg-bottom) 100%);
+    transition: background .7s ease;
+    font-family: 'Quicksand', sans-serif;
+    color: var(--brown);
+  }
+  /* subtle grain + vignette overlay */
+  body::before {
+    content: "";
+    position: fixed;
+    inset: 0;
+    z-index: 0;
+    pointer-events: none;
+    opacity: .05;
+    mix-blend-mode: multiply;
+    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='120' height='120'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='2' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)' opacity='0.35'/%3E%3C/svg%3E");
+  }
+  body::after {
+    content: "";
+    position: fixed;
+    inset: 0;
+    z-index: 0;
+    pointer-events: none;
+    box-shadow: inset 0 0 140px rgba(60, 40, 30, .12);
+  }
+
+  /* =========================================================
+     3. TOP NAV
+     ========================================================= */
+  .site-nav {
+    position: relative;
+    z-index: 2;
+    display: inline-flex;
+    gap: 4px;
+    margin-top: 16px;
+    padding: 5px;
+    border-radius: 999px;
+    background: rgba(255, 255, 255, .55);
+    backdrop-filter: blur(6px);
+  }
+  .site-nav a {
+    padding: 7px 16px;
+    border-radius: 999px;
+    font-family: 'Baloo 2', cursive;
+    font-weight: 600;
+    font-size: 13px;
+    color: var(--loose-text);
+    text-decoration: none;
+    cursor: pointer;
+    transition: background .25s ease, color .25s ease;
+  }
+  .site-nav a.current {
+    background: var(--white);
+    color: var(--accent);
+    box-shadow: 0 3px 8px rgba(0, 0, 0, .1);
+  }
+
+  /* =========================================================
+     4. HEADER: names, "days together" badge, date editor, milestones
+     ========================================================= */
+  .home-kicker {
+    margin: 0 0 4px;
+    font-size: 11px;
+    font-weight: 700;
+    letter-spacing: 1.5px;
+    text-transform: uppercase;
+    color: var(--loose-text);
+    opacity: .75;
+  }
+  .since-date {
+    margin-top: 2px;
+    font-size: 12px;
+    color: var(--loose-text);
+    opacity: .7;
+  }
+  .edit-date-btn {
+    margin-top: 4px;
+    padding: 2px;
+    border: none;
+    background: none;
+    font-family: 'Quicksand', sans-serif;
+    font-size: 11px;
+    color: var(--loose-text);
+    text-decoration: underline;
+    opacity: .75;
+    cursor: pointer;
+  }
+  .date-edit-row {
+    display: none;
+    gap: 6px;
+    align-items: center;
+    justify-content: center;
+    flex-wrap: wrap;
+    margin-top: 8px;
+  }
+  .date-edit-row.show { display: flex; }
+  .date-edit-row input[type=date] {
+    padding: 6px 10px;
+    border: 2px solid #EFE3DA;
+    border-radius: 10px;
+    background: #FBF6F1;
+    font-family: 'Quicksand', sans-serif;
+    font-size: 13px;
+    color: var(--brown);
+  }
+  .date-edit-row button {
+    padding: 6px 14px;
+    border: none;
+    border-radius: 999px;
+    font-family: 'Baloo 2', cursive;
+    font-weight: 700;
+    font-size: 12px;
+    cursor: pointer;
+  }
+  #saveDateBtn   { background: var(--accent); color: #fff; }
+  #cancelDateBtn { background: #EFE3DA; color: var(--brown); }
+  .date-edit-msg {
+    margin-top: 6px;
+    min-height: 14px;
+    font-size: 11.5px;
+    color: #E8483D;
+  }
+  .milestones {
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+    margin-top: 12px;
+  }
+  .milestone-line {
+    margin: 0;
+    font-size: 12.5px;
+    color: var(--loose-text);
+  }
+  .milestone-line.today {
+    color: var(--accent);
+    font-weight: 700;
+  }
+
+  /* =========================================================
+     5. FLOATING PARTICLES (mood emoji drifting upward)
+     ========================================================= */
+  #particle-layer {
+    position: fixed;
+    inset: 0;
+    z-index: 1;
+    overflow: hidden;
+    pointer-events: none;
+  }
+  .floating-particle {
+    position: absolute;
+    bottom: -10%;
+    font-size: 20px;
+    opacity: .85;
+    user-select: none;
+    animation-name: float-up;
+    animation-timing-function: ease-in;
+    animation-fill-mode: forwards;
+  }
+  @keyframes float-up {
+    0%   { transform: translateY(0) translateX(0) rotate(0); opacity: 0; }
+    10%  { opacity: .9; }
+    90%  { opacity: .7; }
+    100% { transform: translateY(-110vh) translateX(var(--drift, 20px)) rotate(25deg); opacity: 0; }
+  }
+
+  /* =========================================================
+     6. INTRO OVERLAY (eyes opening animation on first visit)
+     ========================================================= */
+  #intro-overlay {
+    position: fixed;
+    inset: 0;
+    z-index: 50;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    overflow: hidden;
+    background: linear-gradient(180deg, #FDF1E6 0%, #FBE4D0 100%);
+    transition: opacity .7s ease;
+  }
+  html.skip-intro #intro-overlay { display: none; }
+  #intro-overlay.hide { opacity: 0; pointer-events: none; }
+
+  .intro-eyes-wrap {
+    position: relative;
+    display: flex;
+    gap: 9vw;
+    align-items: center;
+  }
+  .hi-bubble {
+    position: absolute;
+    top: -58px;
+    left: 50%;
+    padding: 8px 16px;
+    border-radius: 16px;
+    background: var(--white);
+    font-family: 'Baloo 2', cursive;
+    font-weight: 700;
+    font-size: 15px;
+    color: #4A3B33;
+    white-space: nowrap;
+    box-shadow: 0 6px 16px rgba(0, 0, 0, .15);
+    opacity: 0;
+    transform: translate(-50%, 10px);
+    transition: opacity .4s ease, transform .4s ease;
+  }
+  .hi-bubble.show { opacity: 1; transform: translate(-50%, 0); }
+
+  .intro-eye {
+    position: relative;
+    width: min(22vw, 96px);
+    height: min(22vw, 96px);
+    overflow: hidden;
+    background: #FFF;
+    border: 5px solid #2B2320;
+    border-radius: 50%;
+    box-shadow: 0 10px 18px rgba(0, 0, 0, .12);
+  }
+  .intro-eye .pupil {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    width: 36%;
+    height: 36%;
+    background: #2B2320;
+    border-radius: 50%;
+    transform: translate(-50%, -50%) scale(0);
+    transition: transform .5s cubic-bezier(.34, 1.56, .64, 1) .35s;
+  }
+  .intro-eye .lid-top,
+  .intro-eye .lid-bottom {
+    position: absolute;
+    left: -2px;
+    right: -2px;
+    z-index: 2;
+    height: 54%;
+    background: #2B2320;
+    transition: transform .45s cubic-bezier(.6, .05, .25, 1);
+  }
+  .intro-eye .lid-top    { top: -2px; transform-origin: top; }
+  .intro-eye .lid-bottom { bottom: -2px; transform-origin: bottom; }
+  #intro-overlay.eyes-open .lid-top,
+  #intro-overlay.eyes-open .lid-bottom { transform: scaleY(.04); }
+  #intro-overlay.eyes-open .pupil { transform: translate(-50%, -50%) scale(1); }
+  #intro-overlay.blinking .lid-top,
+  #intro-overlay.blinking .lid-bottom {
+    transition-duration: .16s;
+    transform: scaleY(1);
+  }
+
+  /* =========================================================
+     7. PAGE / HERO CONTENT
+     ========================================================= */
+  .page {
+    position: relative;
+    z-index: 2;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    width: 100%;
+    max-width: 480px;
+    padding: 32px 20px 48px;
+    text-align: center;
+    opacity: 0;
+    transition: opacity .6s ease;
+  }
+  .page.reveal { opacity: 1; }
+
+  header { margin-bottom: 8px; }
+  .names {
+    margin: 0;
+    font-family: 'Baloo 2', cursive;
+    font-weight: 700;
+    font-size: clamp(28px, 8vw, 38px);
+    color: var(--accent);
+    letter-spacing: .5px;
+  }
+  .names .amp { margin: 0 4px; font-size: .7em; color: var(--loose-text); }
+  .badge {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    margin-top: 14px;
+    padding: 8px 20px;
+    border-radius: 999px;
+    background: var(--white);
+    font-family: 'Baloo 2', cursive;
+    font-weight: 600;
+    font-size: clamp(16px, 4.5vw, 19px);
+    color: var(--accent);
+    box-shadow: 0 4px 14px rgba(0, 0, 0, .12);
+  }
+  .since {
+    margin-top: 10px;
+    font-size: 14px;
+    font-weight: 500;
+    color: var(--loose-text);
+  }
+  .prompt {
+    margin-top: 20px;
+    font-size: 15px;
+    font-weight: 600;
+    color: var(--loose-text);
+  }
+
+  /* speech-bubble message box under the mood picker */
+  .bubble {
+    position: relative;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 100%;
+    max-width: 340px;
+    min-height: 74px;
+    margin-top: 16px;
+    padding: 18px 22px;
+    border-radius: 22px;
+    background: var(--white);
+    box-shadow: 0 8px 24px rgba(0, 0, 0, .14);
+    opacity: 0;
+    transform: translateY(8px) scale(.98);
+    transition: opacity .35s ease, transform .35s cubic-bezier(.34, 1.56, .64, 1);
+  }
+  .bubble::before {
+    content: "";
+    position: absolute;
+    top: -9px;
+    left: 50%;
+    width: 18px;
+    height: 18px;
+    background: var(--white);
+    border-radius: 4px;
+    transform: translateX(-50%) rotate(45deg);
+  }
+  .bubble.show { opacity: 1; transform: translateY(0) scale(1); }
+  .bubble p {
+    margin: 0;
+    font-family: 'Baloo 2', cursive;
+    font-weight: 600;
+    font-size: clamp(15px, 4.3vw, 18px);
+    line-height: 1.4;
+    color: var(--brown);
+  }
+
+  /* =========================================================
+     8. MOOD PICKER
+     ========================================================= */
+  .mood-picker { width: 100%; margin-top: 28px; }
+  .mood-picker h2 {
+    margin: 0 0 14px;
+    font-family: 'Baloo 2', cursive;
+    font-size: clamp(17px, 4.8vw, 20px);
+    color: var(--accent);
+  }
+  .mood-grid {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: 10px;
+  }
+  .mood-btn {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    gap: 4px;
+    padding: 10px 4px;
+    border: 2px solid transparent;
+    border-radius: 16px;
+    background: var(--white);
+    font-family: 'Quicksand', sans-serif;
+    font-weight: 600;
+    font-size: 11.5px;
+    color: var(--brown);
+    box-shadow: 0 3px 10px rgba(0, 0, 0, .08);
+    cursor: pointer;
+    transition: transform .2s cubic-bezier(.34, 1.56, .64, 1), border-color .25s ease, box-shadow .25s ease;
+  }
+  .mood-btn .emoji { font-size: 24px; line-height: 1; }
+  .mood-btn:active { transform: scale(.93); }
+  .mood-btn.active {
+    border-color: var(--accent);
+    box-shadow: 0 6px 16px rgba(0, 0, 0, .16);
+    transform: translateY(-2px) scale(1.04);
+  }
+
+  /* =========================================================
+     9. PARTNER STATUS CARD / INVITE CARD / PLAYGROUND LINK
+     ========================================================= */
+  .playground-link {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    margin-top: 26px;
+    padding: 10px 22px;
+    border-radius: 999px;
+    background: var(--white);
+    font-family: 'Baloo 2', cursive;
+    font-weight: 600;
+    font-size: 15px;
+    color: var(--accent);
+    text-decoration: none;
+    box-shadow: 0 4px 14px rgba(0, 0, 0, .12);
+  }
+  .playground-link:active { transform: scale(.95); }
+
+  .partner-card,
+  .invite-card {
+    display: none;
+    width: 100%;
+    margin-top: 28px;
+    padding: 20px 22px;
+    border-radius: 22px;
+    background: var(--white);
+    box-shadow: 0 8px 24px rgba(0, 0, 0, .1);
+  }
+  .partner-card.show,
+  .invite-card.show { display: block; }
+  .partner-card h2,
+  .invite-card h2 {
+    margin: 0 0 8px;
+    font-family: 'Baloo 2', cursive;
+    font-size: 16px;
+    color: var(--accent);
+  }
+  .partner-row { display: flex; align-items: center; gap: 12px; }
+  .partner-emoji { font-size: 34px; }
+  .partner-note { text-align: left; font-size: 13.5px; line-height: 1.4; color: var(--brown); }
+  .invite-card p { margin: 0 0 10px; font-size: 13px; color: var(--loose-text); }
+  .invite-code {
+    display: inline-block;
+    padding: 10px 20px;
+    border: 2px dashed var(--accent);
+    border-radius: 14px;
+    background: #FBF6F1;
+    font-family: 'Baloo 2', cursive;
+    font-weight: 700;
+    font-size: 24px;
+    letter-spacing: 3px;
+    color: var(--accent);
+  }
+
+  /* =========================================================
+     10. PHOTO / VIDEO GALLERY
+     ========================================================= */
+  .gallery { width: 100%; margin-top: 32px; }
+  .gallery h2 {
+    margin: 0 0 16px;
+    font-family: 'Baloo 2', cursive;
+    font-size: clamp(18px, 5vw, 22px);
+    color: var(--accent);
+  }
+  .photo-row { display: flex; gap: 12px; justify-content: center; flex-wrap: wrap; }
+  .photo-slot {
+    position: relative;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    gap: 6px;
+    width: 106px;
+    height: 106px;
+    overflow: hidden;
+    border: 2px dashed var(--accent);
+    border-radius: 20px;
+    background: var(--white);
+    color: var(--accent);
+    font-size: 11px;
+    font-weight: 600;
+    transition: border-color .6s ease, color .6s ease;
+  }
+  .photo-slot img,
+  .photo-slot video {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    border-radius: 18px;
+    cursor: pointer;
+  }
+  .photo-slot svg { width: 28px; height: 28px; opacity: .7; }
+  .photo-slot.add-slot { cursor: pointer; }
+  .photo-slot.add-slot:active { transform: scale(.95); }
+  .photo-slot.uploading { opacity: .55; pointer-events: none; }
+  .video-icon {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 42px;
+    height: 42px;
+    border-radius: 50%;
+    background: rgba(255, 255, 255, .9);
+    color: #4A3B33;
+    font-size: 18px;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, .2);
+    pointer-events: none;
+    transform: translate(-50%, -50%);
+  }
+  .gallery-hint {
+    margin-top: 10px;
+    min-height: 14px;
+    font-size: 11.5px;
+    color: var(--loose-text);
+    opacity: .8;
+  }
+  .photo-delete {
+    position: absolute;
+    top: 5px;
+    right: 5px;
+    z-index: 2;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 22px;
+    height: 22px;
+    border: none;
+    border-radius: 50%;
+    background: rgba(30, 20, 18, .55);
+    color: #fff;
+    font-size: 12px;
+    line-height: 1;
+    cursor: pointer;
+  }
+  .photo-delete:active { transform: scale(.9); }
+  .photo-delete.confirm {
+    width: auto;
+    padding: 0 8px;
+    background: #E8483D;
+    font-size: 10.5px;
+    font-weight: 700;
+  }
+
+  /* fullscreen photo/video viewer */
+  .lightbox {
+    position: fixed;
+    inset: 0;
+    z-index: 100;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 28px;
+    background: rgba(20, 14, 12, .86);
+    opacity: 0;
+    pointer-events: none;
+    transition: opacity .25s ease;
+  }
+  .lightbox.show { opacity: 1; pointer-events: auto; }
+  .lightbox img,
+  .lightbox video {
+    max-width: 100%;
+    max-height: 100%;
+    border-radius: 16px;
+    box-shadow: 0 20px 50px rgba(0, 0, 0, .4);
+  }
+  .lightbox video { width: auto; height: auto; background: #000; }
+  .lightbox-close {
+    position: absolute;
+    top: 18px;
+    right: 18px;
+    z-index: 3;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 38px;
+    height: 38px;
+    border: none;
+    border-radius: 50%;
+    background: rgba(255, 255, 255, .92);
+    color: var(--brown);
+    font-size: 17px;
+    cursor: pointer;
+  }
+
+  footer { margin-top: 30px; font-size: 13px; color: var(--loose-text); opacity: .9; }
+  footer .signature {
+    margin-top: 4px;
+    font-family: 'Baloo 2', cursive;
+    font-size: 16px;
+    color: var(--accent);
+  }
+
+  /* =========================================================
+     11. NOTIFICATIONS BELL + PANEL
+     ========================================================= */
+  .notification-wrap { position: fixed; top: 18px; right: 18px; z-index: 90; }
+  .notification-btn {
+    position: relative;
+    width: 46px;
+    height: 46px;
+    border: none;
+    border-radius: 50%;
+    background: var(--white);
+    font-size: 21px;
+    box-shadow: 0 5px 18px rgba(0, 0, 0, .15);
+    cursor: pointer;
+  }
+  .notification-btn:active { transform: scale(.92); }
+  .notification-dot {
+    display: none;
+    position: absolute;
+    top: 2px;
+    right: 2px;
+    width: 12px;
+    height: 12px;
+    border: 2px solid white;
+    border-radius: 50%;
+    background: #E8483D;
+  }
+  .notification-dot.show { display: block; }
+  .notification-panel {
+    display: none;
+    position: absolute;
+    top: 54px;
+    right: 0;
+    width: 310px;
+    max-width: calc(100vw - 36px);
+    max-height: 420px;
+    overflow-y: auto;
+    padding: 14px;
+    border-radius: 20px;
+    background: var(--white);
+    box-shadow: 0 12px 35px rgba(0, 0, 0, .18);
+  }
+  .notification-panel.show { display: block; }
+  .notification-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    margin-bottom: 10px;
+  }
+  .notification-header h3 { margin: 0; font-family: 'Baloo 2', cursive; font-size: 18px; color: var(--accent); }
+  .notification-clear {
+    border: none;
+    background: none;
+    font-family: 'Quicksand', sans-serif;
+    font-size: 11px;
+    color: var(--loose-text);
+    cursor: pointer;
+  }
+  .notification-item {
+    margin-bottom: 8px;
+    padding: 12px;
+    border-radius: 14px;
+    background: #FBF6F1;
+    text-align: left;
+  }
+  .notification-item.unread { border-left: 3px solid var(--accent); }
+  .notification-title { font-size: 13px; font-weight: 700; color: var(--brown); }
+  .notification-message { margin-top: 3px; font-size: 12px; line-height: 1.35; color: var(--loose-text); }
+  .notification-time { margin-top: 5px; font-size: 10px; color: var(--loose-text); opacity: .65; }
+  .notification-empty { padding: 25px 10px; font-size: 12px; text-align: center; color: var(--loose-text); }
+</style>
+</head>
+<body class="mood-happy">
+
+<div id="particle-layer"></div>
+
+<!-- Notifications bell + dropdown -->
+<div class="notification-wrap">
+  <button type="button" class="notification-btn" id="notificationBtn" aria-label="Notificações">
+    🔔<span class="notification-dot" id="notificationDot"></span>
+  </button>
+  <div class="notification-panel" id="notificationPanel">
+    <div class="notification-header">
+      <h3>Notificações 💕</h3>
+      <button type="button" class="notification-clear" id="notificationClear">Marcar todas como lidas</button>
+    </div>
+    <div id="notificationList"><div class="notification-empty">Carregando notificações...</div></div>
+  </div>
+</div>
+
+<!-- First-visit "eyes opening" intro animation -->
+<div id="intro-overlay">
+  <div class="intro-eyes-wrap" id="introEyes">
+    <div class="hi-bubble" id="hiBubble">oi... Eu vejo você 👀</div>
+    <div class="intro-eye"><div class="lid-top"></div><div class="pupil"></div><div class="lid-bottom"></div></div>
+    <div class="intro-eye"><div class="lid-top"></div><div class="pupil"></div><div class="lid-bottom"></div></div>
+  </div>
+</div>
+
+<div class="page" id="page">
+
+  <header>
+    <p class="home-kicker">💞 twogether</p>
+    <p class="names" id="namesHeading">Carregando<span class="amp">&amp;</span>...</p>
+
+    <div class="badge" id="badge">👀 together 💕</div>
+    <p class="since" id="sinceCounter">Contando nossos dias...</p>
+    <p class="since-date" id="sinceDate"></p>
+
+    <button type="button" class="edit-date-btn" id="editDateBtn">✏️ edite sua data</button>
+    <div class="date-edit-row" id="dateEditRow">
+      <input type="date" id="sinceDateInput">
+      <button type="button" id="saveDateBtn">Salve</button>
+      <button type="button" id="cancelDateBtn">Cancele</button>
+    </div>
+    <p class="date-edit-msg" id="dateEditMsg"></p>
+
+    <div class="milestones" id="milestones">
+      <p class="milestone-line" id="monthsaryLine"></p>
+      <p class="milestone-line" id="anniversaryLine"></p>
+    </div>
+
+    <nav class="site-nav">
+      <a href="index.html" class="current">🏡 Início</a>
+      <a href="playground.html">🎈 Mascotinho</a>
+      <a id="logoutLink">🚪 Saída</a>
+    </nav>
+  </header>
+
+  <p class="prompt" id="prompt">Como você está se sentindo hoje, amor?</p>
+
+  <div class="bubble show" id="bubble">
+    <p id="bubbleText">Escolha um humor — a página inteira vai sentir junto com você 🩷</p>
+  </div>
+
+  <section class="mood-picker">
+    <h2>Como meu amor está se sentindo?</h2>
+    <div class="mood-grid" id="moodGrid">
+      <button type="button" class="mood-btn" data-mood="happy"><span class="emoji">😊</span>Feliz</button>
+      <button type="button" class="mood-btn" data-mood="tired"><span class="emoji">🥱</span>Cansado(a)</button>
+      <button type="button" class="mood-btn" data-mood="sad"><span class="emoji">😢</span>Triste</button>
+      <button type="button" class="mood-btn" data-mood="mad"><span class="emoji">😠</span>Com raiva</button>
+      <button type="button" class="mood-btn" data-mood="hungry"><span class="emoji">🍙</span>Com fome</button>
+      <button type="button" class="mood-btn" data-mood="sleepy"><span class="emoji">😴</span>Com sono</button>
+      <button type="button" class="mood-btn" data-mood="excited"><span class="emoji">🤩</span>Animado(a)</button>
+      <button type="button" class="mood-btn" data-mood="naughty"><span class="emoji">😏</span>Travesso(a)</button>
+    </div>
+  </section>
+
+  <section class="partner-card" id="partnerCard">
+    <h2 id="partnerHeading">Como meu amor está se sentindo?</h2>
+    <div class="partner-row">
+      <span class="partner-emoji" id="partnerEmoji">😊</span>
+      <p class="partner-note" id="partnerNote">—</p>
+    </div>
+  </section>
+
+  <section class="invite-card" id="inviteCard">
+    <h2>Esperando pelo seu parceiro 💌</h2>
+    <p>Compartilhe este código com ele(a) — ele(a) vai inseri-lo ao se cadastrar e vocês serão conectados.</p>
+    <div class="invite-code" id="inviteCode">------</div>
+  </section>
+
+  <a class="playground-link" href="playground.html">🎈 Visite seu mascotinho</a>
+
+  <section class="gallery">
+    <h2>Nossas Pequenas Memórias 📸🎥</h2>
+    <div class="photo-row" id="photoRow">
+      <div class="photo-slot add-slot" id="addPhotoSlot">
+        <svg viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+          <rect x="3" y="6" width="18" height="14" rx="2" stroke="currentColor" stroke-width="1.6"/>
+          <circle cx="12" cy="13" r="3.2" stroke="currentColor" stroke-width="1.6"/>
+          <path d="M8 6L9.5 3.5H14.5L16 6" stroke="currentColor" stroke-width="1.6"/>
+        </svg>
+        <span>Adicionar memória</span>
+      </div>
+    </div>
+    <input type="file" id="photoInput" accept="image/*,video/*" style="display:none">
+    <p class="gallery-hint" id="galleryHint"></p>
+  </section>
+
+  <div class="lightbox" id="lightbox">
+    <button type="button" class="lightbox-close" id="lightboxClose" aria-label="Fechar">✕</button>
+    <img id="lightboxImg" src="" alt="Uma memória, ampliada">
+    <video id="lightboxVideo" controls playsinline preload="metadata" style="display:none"></video>
+  </div>
+
+  <footer>
+    <p>Cada humor, cada mês — é você quem eu escolho.</p>
+    <p class="signature">👀💕</p>
+  </footer>
+
+</div>
+
+<script type="module">
+/* =========================================================
+   CONFIG / SUPABASE CLIENT
+   ========================================================= */
+import { createClient } from 'https://esm.sh/@supabase/supabase-js@2';
+
+const SUPABASE_URL = "https://uxuplzjsmoilzrobiflh.supabase.co";
+const SUPABASE_ANON_KEY = "sb_publishable_1mKkxDpM7WJvFm1xGVXxBA_5o1x6m9e";
+const supabase = createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+
+const VAPID_PUBLIC_KEY = "BKwwnhtDwsB7A42rRnHID6qe1ZNLt4zBiKYftAcr-qGgU-8HZQfc121UhEJJF3AnNcnZvZxIsyVylauIWFjizWA";
+const GALLERY_BUCKET = 'gallery-photos';
+
+/* =========================================================
+   MOOD DATA
+   ========================================================= */
+const moods = {
+  happy:   { particles: ['💕', '💗', '🩷', '💖'], messages: [
+    "Ver você tão feliz ilumina o meu dia inteiro. Seu sorriso é a minha coisa favorita no mundo. 💕",
+    "Esse é o sorriso pelo qual me apaixonei. Continue assim, feliz para sempre, tá?"
+  ]},
+  tired:   { particles: ['💤'], messages: [
+    "Aww, meu amor cansadinho(a). Vai descansar um pouquinho — eu vou estar aqui quando você acordar. 🤍",
+    "Você já fez tanta coisa hoje. Agora descansa um pouquinho, deixa que eu cuido de você."
+  ]},
+  sad:     { particles: ['💧', '🩵'], messages: [
+    "Queria poder te abraçar através da tela agora. Seja o que for, a gente vai passar por isso juntos. 🫂",
+    "Vem cá, meu amor. Eu não vou a lugar nenhum. Quando estiver pronto(a), pode falar comigo."
+  ]},
+  mad:     { particles: ['💢'], messages: [
+    "Eita, alguém tá bravo(a) 🔥 Desculpa se eu fiz alguma coisa — me conta o que aconteceu pra eu tentar consertar.",
+    "Tá bom, tá bom, eu entendi. Pode falar, tô te ouvindo."
+  ]},
+  hungry:  { particles: ['🍙', '🍡', '🍜'], messages: [
+    "Bora matar essa fome agora! O que você tá com vontade de comer? 🍙",
+    "Meu amor tá com fome! Vai pegar alguma coisinha pra comer, vai te fazer bem."
+  ]},
+  sleepy:  { particles: ['⭐', '🌙', '💤'], messages: [
+    "Bons sonhos, meu soninho. Fecha esses olhinhos, eu cuido de você. Sonha com a gente, tá? 🌙",
+    "Vai se aconchegar e descansar, meu amor. Quero ser seu último pensamento hoje e o primeiro amanhã."
+  ]},
+  excited: { particles: ['✨', '🎉', '⭐', '💛'], messages: [
+    "SIMMM, eu amo essa energia!! Me conta tudo, tô tão animado(a) quanto você! 🎉",
+    "Aí está essa energia que eu adoro. Vamos comemorar seja lá o que for isso!"
+  ]},
+  naughty: { particles: ['💜', '😏'], messages: [
+    "Ooooh, olha só quem tá aprontando hoje. 😏",
+    "Hmm, o que você tá aprontando, hein?"
+  ]}
+};
+
+const moodEmoji = {
+  happy: '😊', tired: '🥱', sad: '😢', mad: '😠',
+  hungry: '🍙', sleepy: '😴', excited: '🤩', naughty: '😏'
+};
+
+const partnerSuggestions = {
+  happy:   "{name} Está feliz! Continuem sendo incríveis juntos. 💕",
+  tired:   "{name} Está cansado(a) — talvez seja melhor deixar ele(a) descansar um pouquinho. 🤍",
+  sad:     "{name} Está triste — talvez esteja precisando de um abraço. 💙",
+  mad:     "{name} Está chateado(a) — vai com calma e pergunta se está tudo bem. 🔥",
+  hungry:  "{name} Está com fome — dá alguma coisa pra ele(a) comer! 🍙",
+  sleepy:  "{name} Está com sono — deixa ele(a) tirar uma soneca. 🌙",
+  excited: "{name} Está animado(a) — comemora junto com ele(a)! 🎉",
+  naughty: "{name} Está aprontando hoje 😏"
+};
+
+/* =========================================================
+   SHARED STATE
+   ========================================================= */
+const body = document.body;
+const bubble = document.getElementById('bubble');
+const bubbleText = document.getElementById('bubbleText');
+const moodButtons = document.querySelectorAll('.mood-btn');
+
+let currentParticles = ['💕', '💗', '🩷', '💖'];
+let lastMessageIndex = -1;
+let myUserId = null;
+let myProfile = null;
+let pairInfo = null;
+let partnerProfile = null;
+
+/* =========================================================
+   FLOATING PARTICLES
+   ========================================================= */
+const particleLayer = document.getElementById('particle-layer');
+
+function spawnParticle() {
+  const el = document.createElement('div');
+  el.className = 'floating-particle';
+  el.textContent = currentParticles[Math.floor(Math.random() * currentParticles.length)];
+  el.style.left = Math.random() * 100 + 'vw';
+  el.style.fontSize = 14 + Math.random() * 16 + 'px';
+  el.style.setProperty('--drift', (Math.random() * 80 - 40) + 'px');
+  const duration = 7 + Math.random() * 6;
+  el.style.animationDuration = duration + 's';
+  particleLayer.appendChild(el);
+  setTimeout(() => el.remove(), duration * 1000 + 200);
+}
+setInterval(spawnParticle, 900);
+for (let i = 0; i < 4; i++) setTimeout(spawnParticle, i * 300);
+
+function spawnBurst() {
+  for (let j = 0; j < 6; j++) setTimeout(spawnParticle, j * 60);
+}
+
+/* =========================================================
+   MOOD PICKER
+   ========================================================= */
+function pickMessage(list) {
+  if (list.length === 1) return list[0];
+  let idx;
+  do { idx = Math.floor(Math.random() * list.length); } while (idx === lastMessageIndex);
+  lastMessageIndex = idx;
+  return list[idx];
+}
+
+function applyMood(mood, opts = {}) {
+  const config = moods[mood];
+  if (!config) return;
+
+  body.className = 'mood-' + mood;
+  moodButtons.forEach(btn => btn.classList.toggle('active', btn.dataset.mood === mood));
+  currentParticles = config.particles;
+  bubbleText.textContent = opts.deterministic ? config.messages[0] : pickMessage(config.messages);
+  bubble.classList.add('show');
+  if (!opts.silent) spawnBurst();
+
+  try { localStorage.setItem('monthsaryMood', mood); } catch (e) {}
+
+  if (myUserId && !opts.fromRemote) {
+    supabase.from('mood_state')
+      .upsert({ user_id: myUserId, mood, updated_at: new Date().toISOString() })
+      .then(() => {});
+    notifyPartner('Mudança de humor 💗', (myProfile && myProfile.display_name ? myProfile.display_name : 'Seu amor') + ' agora está se sentindo ' + (moodEmoji[mood] || '') + '!');
+  }
+}
+
+moodButtons.forEach(btn => btn.addEventListener('click', () => applyMood(btn.dataset.mood)));
+
+/* =========================================================
+   NOTIFICATIONS (bell, panel, push)
+   ========================================================= */
+
+async function notifyPartner(title, message) {
+  try {
+    if (!myProfile || !myProfile.pair_id || !myUserId) return;
+
+    const { data: partner } = await supabase
+      .from('profiles')
+      .select('user_id, display_name')
+      .eq('pair_id', myProfile.pair_id)
+      .neq('user_id', myUserId)
+      .maybeSingle();
+
+    if (!partner) {
+      console.log('Parceiro ainda não encontrado.');
+      return;
+    }
+
+    const { error } = await supabase
+      .from('notifications')
+      .insert({
+        user_id: partner.user_id,
+        title: title,
+        message: message,
+        read: false
+      });
+
+    if (error) {
+      console.error('ERRO AO CRIAR NOTIFICAÇÃO:', error);
+      return;
+    }
+
+    console.log('Notificação enviada para:', partner.display_name);
+
+    // Também manda a notificação push de verdade pro celular do parceiro
+    // (a inserção acima só alimenta o sininho dentro do app).
+    try {
+      await supabase.functions.invoke('send-push', {
+        body: { target_user_id: partner.user_id, title, message, url: '/index.html' }
+      });
+    } catch (pushError) {
+      console.error('ERRO AO ENVIAR PUSH:', pushError);
+    }
+  } catch (error) {
+    console.error('ERRO AO NOTIFICAR PARCEIRO:', error);
+  }
+}
+
+const notificationBtn = document.getElementById('notificationBtn');
+const notificationPanel = document.getElementById('notificationPanel');
+const notificationDot = document.getElementById('notificationDot');
+const notificationList = document.getElementById('notificationList');
+const notificationClear = document.getElementById('notificationClear');
+
+function urlBase64ToUint8Array(base64String) {
+  const padding = "=".repeat((4 - base64String.length % 4) % 4);
+  const base64 = (base64String + padding).replace(/-/g, "+").replace(/_/g, "/");
+  const rawData = atob(base64);
+  return Uint8Array.from(Array.from(rawData).map(c => c.charCodeAt(0)));
+}
+
+async function enablePushNotifications() {
+  try {
+    if (!("Notification" in window) || !("serviceWorker" in navigator)) {
+      alert("Seu navegador não suporta notificações.");
+      return;
+    }
+
+    const permission = await Notification.requestPermission();
+    if (permission !== "granted") {
+      alert("Permissão para notificações não concedida.");
+      return;
+    }
+
+    const registration = await navigator.serviceWorker.register("/sw.js");
+    let subscription = await registration.pushManager.getSubscription();
+
+    if (!subscription) {
+      subscription = await registration.pushManager.subscribe({
+        userVisibleOnly: true,
+        applicationServerKey: urlBase64ToUint8Array(VAPID_PUBLIC_KEY)
+      });
+    }
+
+    const subscriptionJSON = subscription.toJSON();
+    const result = await supabase.from("push_subscriptions").upsert(
+      {
+        user_id: myUserId,
+        endpoint: subscriptionJSON.endpoint,
+        p256dh: subscriptionJSON.keys.p256dh,
+        auth: subscriptionJSON.keys.auth,
+        subscription: subscriptionJSON
+      },
+      { onConflict: "user_id" }
+    );
+
+    if (result.error) {
+      console.error("ERRO AO SALVAR INSCRIÇÃO:", result.error);
+      alert("Erro ao salvar a inscrição no Supabase.");
+      return;
+    }
+
+    alert("Notificações ativadas! 🔔💕");
+  } catch (error) {
+    console.error("Erro nas notificações:", error);
+    alert("Não foi possível ativar as notificações.");
+  }
+}
+
+const pushButton = document.createElement("button");
+pushButton.type = "button";
+pushButton.textContent = "🔔 Ativar notificações";
+pushButton.style.cssText = `
+  width: 100%;
+  margin: 10px 0;
+  padding: 11px;
+  border: none;
+  border-radius: 14px;
+  background: var(--accent);
+  color: white;
+  font-family: 'Baloo 2', cursive;
+  font-weight: 700;
+  font-size: 14px;
+  cursor: pointer;
+`;
+notificationPanel.prepend(pushButton);
+pushButton.addEventListener("click", enablePushNotifications);
+
+function notificationTime(value) {
+  const diff = Math.floor((Date.now() - new Date(value).getTime()) / 1000);
+  if (diff < 60) return 'agora';
+  const min = Math.floor(diff / 60);
+  if (min < 60) return 'há ' + min + (min === 1 ? ' minuto' : ' minutos');
+  const h = Math.floor(min / 60);
+  if (h < 24) return 'há ' + h + (h === 1 ? ' hora' : ' horas');
+  const d = Math.floor(h / 24);
+  return 'há ' + d + (d === 1 ? ' dia' : ' dias');
+}
+
+async function updateNotificationDot() {
+  if (!myUserId) return;
+  const r = await supabase.from('notifications').select('id').eq('user_id', myUserId).eq('read', false).limit(1);
+  if (!r.error) notificationDot.classList.toggle('show', !!(r.data && r.data.length));
+}
+
+async function loadNotifications() {
+  if (!myUserId) return;
+  notificationList.innerHTML = '<div class="notification-empty">Carregando notificações...</div>';
+
+  const r = await supabase.from('notifications').select('*').eq('user_id', myUserId).order('created_at', { ascending: false }).limit(50);
+  if (r.error) {
+    console.error('Erro ao carregar notificações:', r.error);
+    notificationList.innerHTML = '<div class="notification-empty">Não foi possível carregar 😢</div>';
+    return;
+  }
+
+  notificationList.innerHTML = '';
+  if (!r.data || !r.data.length) {
+    notificationList.innerHTML = '<div class="notification-empty">Nenhuma notificação ainda 💕</div>';
+    notificationDot.classList.remove('show');
+    return;
+  }
+
+  r.data.forEach(n => {
+    const item = document.createElement('div');
+    item.className = 'notification-item' + (n.read ? '' : ' unread');
+    item.innerHTML = '<div class="notification-title"></div><div class="notification-message"></div><div class="notification-time"></div>';
+    item.querySelector('.notification-title').textContent = n.title || 'Notificação';
+    item.querySelector('.notification-message').textContent = n.message || '';
+    item.querySelector('.notification-time').textContent = notificationTime(n.created_at);
+    item.addEventListener('click', async () => {
+      if (n.read) return;
+      const x = await supabase.from('notifications').update({ read: true }).eq('id', n.id).eq('user_id', myUserId);
+      if (!x.error) {
+        n.read = true;
+        item.classList.remove('unread');
+        await updateNotificationDot();
+      }
+    });
+    notificationList.appendChild(item);
+  });
+
+  await updateNotificationDot();
+}
+
+notificationBtn.addEventListener('click', async e => {
+  e.stopPropagation();
+  notificationPanel.classList.toggle('show');
+  if (notificationPanel.classList.contains('show')) await loadNotifications();
+});
+notificationPanel.addEventListener('click', e => e.stopPropagation());
+notificationClear.addEventListener('click', async () => {
+  if (!myUserId) return;
+  const r = await supabase.from('notifications').update({ read: true }).eq('user_id', myUserId).eq('read', false);
+  if (!r.error) await loadNotifications();
+});
+document.addEventListener('click', () => notificationPanel.classList.remove('show'));
+
+/* =========================================================
+   PARTNER CARD / INVITE CARD
+   ========================================================= */
+const partnerCard = document.getElementById('partnerCard');
+const inviteCard = document.getElementById('inviteCard');
+const partnerHeading = document.getElementById('partnerHeading');
+const partnerEmoji = document.getElementById('partnerEmoji');
+const partnerNote = document.getElementById('partnerNote');
+const inviteCode = document.getElementById('inviteCode');
+
+function renderPartnerMood(mood) {
+  const m = mood || 'happy';
+  partnerEmoji.textContent = moodEmoji[m] || '😊';
+  partnerNote.textContent = (partnerSuggestions[m] || '').replace('{name}', partnerProfile.display_name || 'Your partner');
+}
+
+async function refreshPartnerSection() {
+  if (!partnerProfile) {
+    inviteCard.classList.add('show');
+    partnerCard.classList.remove('show');
+    inviteCode.textContent = pairInfo ? pairInfo.invite_code : '------';
+    return;
+  }
+  inviteCard.classList.remove('show');
+  partnerCard.classList.add('show');
+  partnerHeading.textContent = "Como " + partnerProfile.display_name + " está se sentindo?";
+  const { data: row } = await supabase.from('mood_state').select('mood').eq('user_id', partnerProfile.user_id).maybeSingle();
+  renderPartnerMood(row ? row.mood : 'happy');
+}
+
+/* =========================================================
+   "DAYS TOGETHER" COUNTER + MILESTONES + DATE EDITOR
+   ========================================================= */
+const sinceCounterEl = document.getElementById('sinceCounter');
+const sinceDateEl = document.getElementById('sinceDate');
+
+function updateDaysTogether(sinceDateStr) {
+  if (!sinceCounterEl || !sinceDateStr) return;
+  const start = new Date(sinceDateStr + 'T00:00:00');
+  let days = Math.floor((Date.now() - start.getTime()) / 86400000);
+  if (days < 0) days = 0;
+
+  sinceCounterEl.textContent = days + (days === 1 ? ' dia' : ' dias') + ' juntos e contando os dias 💗';
+
+  const months = Math.floor(days / 30);
+  document.getElementById('badge').textContent =
+    '👀 ' + (months >= 1 ? (months + (months === 1 ? ' Month' : ' Months')) : (days + (days === 1 ? ' Dia' : ' Dias'))) + ' Juntos 💕';
+
+  sinceDateEl.textContent = 'desde ' + start.toLocaleDateString(undefined, { year: 'numeric', month: 'long', day: 'numeric' });
+}
+
+function fmtMonthDay(d) {
+  return d.toLocaleDateString(undefined, { month: 'long', day: 'numeric' });
+}
+
+function computeMilestones(sinceDateStr) {
+  const start = new Date(sinceDateStr + 'T00:00:00');
+  const now = new Date();
+  now.setHours(0, 0, 0, 0);
+
+  const startDay = start.getDate();
+  let months = (now.getFullYear() - start.getFullYear()) * 12 + (now.getMonth() - start.getMonth());
+  if (now.getDate() < startDay) months--;
+  if (months < 0) months = 0;
+
+  let nextMonthsary = new Date(now.getFullYear(), now.getMonth(), startDay);
+  if (nextMonthsary.getTime() < now.getTime()) nextMonthsary = new Date(now.getFullYear(), now.getMonth() + 1, startDay);
+
+  let nextAnniversary = new Date(now.getFullYear(), start.getMonth(), startDay);
+  if (nextAnniversary.getTime() < now.getTime()) nextAnniversary = new Date(now.getFullYear() + 1, start.getMonth(), startDay);
+
+  return {
+    months,
+    nextMonthsary,
+    daysUntilMonthsary: Math.round((nextMonthsary - now) / 86400000),
+    monthsaryToday: nextMonthsary.getTime() === now.getTime(),
+    nextAnniversary,
+    daysUntilAnniversary: Math.round((nextAnniversary - now) / 86400000),
+    anniversaryToday: nextAnniversary.getTime() === now.getTime()
+  };
+}
+
+function renderMilestones(sinceDateStr) {
+  if (!sinceDateStr) return;
+  const m = computeMilestones(sinceDateStr);
+  const a = document.getElementById('monthsaryLine');
+  const b = document.getElementById('anniversaryLine');
+
+  if (m.monthsaryToday && m.months >= 1) {
+    a.textContent = '🎉 Feliz ' + m.months + ' Hoje é nosso mêsversário!';
+    a.classList.add('today');
+  } else {
+    a.textContent = '🎂 Próximo mêsversário: ' + fmtMonthDay(m.nextMonthsary) + ' (em ' + m.daysUntilMonthsary + (m.daysUntilMonthsary === 1 ? ' dia)' : ' dias)');
+    a.classList.remove('today');
+  }
+
+  if (m.anniversaryToday && m.months >= 12) {
+    const years = Math.round(m.months / 12);
+    b.textContent = '💍 Feliz ' + years + ' — Hoje é nosso aniversário de namoro!';
+    b.classList.add('today');
+  } else {
+    b.textContent = '💍 Próximo aniversário: ' + fmtMonthDay(m.nextAnniversary) + ' (em ' + m.daysUntilAnniversary + (m.daysUntilAnniversary === 1 ? ' dia)' : ' dias)');
+    b.classList.remove('today');
+  }
+}
+
+const editDateBtn = document.getElementById('editDateBtn');
+const dateEditRow = document.getElementById('dateEditRow');
+const sinceDateInput = document.getElementById('sinceDateInput');
+const saveDateBtn = document.getElementById('saveDateBtn');
+const cancelDateBtn = document.getElementById('cancelDateBtn');
+const dateEditMsg = document.getElementById('dateEditMsg');
+
+editDateBtn.addEventListener('click', () => {
+  sinceDateInput.value = pairInfo ? pairInfo.since_date : '';
+  dateEditMsg.textContent = '';
+  dateEditRow.classList.add('show');
+  editDateBtn.style.display = 'none';
+});
+
+cancelDateBtn.addEventListener('click', () => {
+  dateEditRow.classList.remove('show');
+  editDateBtn.style.display = '';
+});
+
+saveDateBtn.addEventListener('click', async () => {
+  const newDate = sinceDateInput.value;
+  if (!newDate || !pairInfo) return;
+
+  saveDateBtn.disabled = true;
+  const { error } = await supabase.from('pairs').update({ since_date: newDate }).eq('id', pairInfo.id);
+  saveDateBtn.disabled = false;
+
+  if (error) {
+    console.error('ERRO AO SALVAR DATA:', error);
+    dateEditMsg.textContent = 'Não foi possível salvar essa data — tente novamente?';
+    return;
+  }
+
+  pairInfo.since_date = newDate;
+  dateEditRow.classList.remove('show');
+  editDateBtn.style.display = '';
+  updateDaysTogether(newDate);
+  renderMilestones(newDate);
+  notifyPartner('Data alterada 💍', (myProfile && myProfile.display_name ? myProfile.display_name : 'Seu amor') + ' atualizou a data de vocês juntos.');
+});
+
+/* =========================================================
+   PHOTO / VIDEO GALLERY
+   ========================================================= */
+const photoRow = document.getElementById('photoRow');
+const addPhotoSlot = document.getElementById('addPhotoSlot');
+const photoInput = document.getElementById('photoInput');
+const galleryHint = document.getElementById('galleryHint');
+
+const lightbox = document.getElementById('lightbox');
+const lightboxImg = document.getElementById('lightboxImg');
+const lightboxVideo = document.getElementById('lightboxVideo');
+const lightboxClose = document.getElementById('lightboxClose');
+
+function openLightbox(src, isVideo) {
+  lightboxImg.style.display = isVideo ? 'none' : '';
+  lightboxVideo.style.display = isVideo ? 'block' : 'none';
+  if (isVideo) {
+    lightboxVideo.src = src;
+    lightboxVideo.currentTime = 0;
+  } else {
+    lightboxVideo.pause();
+    lightboxVideo.removeAttribute('src');
+    lightboxImg.src = src;
+  }
+  lightbox.classList.add('show');
+}
+
+function closeLightbox() {
+  lightboxVideo.pause();
+  lightboxVideo.removeAttribute('src');
+  lightbox.classList.remove('show');
+}
+
+lightboxClose.addEventListener('click', closeLightbox);
+lightbox.addEventListener('click', e => { if (e.target === lightbox) closeLightbox(); });
+
+async function deleteMedia(name, slotEl, delBtn) {
+  delBtn.disabled = true;
+  slotEl.style.opacity = '.4';
+
+  const path = myProfile.pair_id + '/' + name;
+  const { error } = await supabase.storage.from(GALLERY_BUCKET).remove([path]);
+
+  if (error) {
+    slotEl.style.opacity = '1';
+    delBtn.disabled = false;
+    galleryHint.textContent = 'Não foi possível excluir — tente novamente 🥺';
+    return;
+  }
+
+  slotEl.remove();
+  galleryHint.textContent = 'Memória removida 🕊️';
+  setTimeout(() => galleryHint.textContent = '', 2000);
+}
+
+function renderMedia(name, url, isVideo) {
+  const slot = document.createElement('div');
+  slot.className = 'photo-slot';
+
+  if (isVideo) {
+    const video = document.createElement('video');
+    video.src = url;
+    video.muted = true;
+    video.playsInline = true;
+    video.preload = 'metadata';
+    video.addEventListener('loadedmetadata', () => { try { video.currentTime = .01; } catch (e) {} });
+    video.addEventListener('click', () => openLightbox(url, true));
+    slot.appendChild(video);
+
+    const icon = document.createElement('span');
+    icon.className = 'video-icon';
+    icon.textContent = '▶';
+    slot.appendChild(icon);
+  } else {
+    const img = document.createElement('img');
+    img.src = url;
+    img.alt = 'Uma memória';
+    img.loading = 'lazy';
+    img.addEventListener('click', () => openLightbox(url, false));
+    slot.appendChild(img);
+  }
+
+  const delBtn = document.createElement('button');
+  delBtn.type = 'button';
+  delBtn.className = 'photo-delete';
+  delBtn.textContent = '✕';
+  delBtn.setAttribute('aria-label', 'Excluir esta memória');
+  delBtn.addEventListener('click', e => {
+    e.stopPropagation();
+    if (delBtn.classList.contains('confirm')) {
+      deleteMedia(name, slot, delBtn);
+      return;
+    }
+    delBtn.classList.add('confirm');
+    delBtn.textContent = 'excluir?';
+    clearTimeout(delBtn._resetTimer);
+    delBtn._resetTimer = setTimeout(() => {
+      delBtn.classList.remove('confirm');
+      delBtn.textContent = '✕';
+    }, 2500);
+  });
+  slot.appendChild(delBtn);
+
+  photoRow.appendChild(slot);
+}
+
+async function loadGallery() {
+  const { data: files, error } = await supabase.storage
+    .from(GALLERY_BUCKET)
+    .list(myProfile.pair_id, { limit: 100, sortBy: { column: 'created_at', order: 'desc' } });
+  if (error || !files) return;
+
+  photoRow.querySelectorAll('.photo-slot:not(.add-slot)').forEach(el => el.remove());
+
+  for (const f of files) {
+    if (!f.id) continue;
+    const path = myProfile.pair_id + '/' + f.name;
+    const { data: signed } = await supabase.storage.from(GALLERY_BUCKET).createSignedUrl(path, 3600);
+    if (signed) {
+      const isVideo = /\.(mp4|mov|webm|m4v|ogg|avi)$/i.test(f.name.toLowerCase());
+      renderMedia(f.name, signed.signedUrl, isVideo);
+    }
+  }
+}
+
+addPhotoSlot.addEventListener('click', () => photoInput.click());
+
+photoInput.addEventListener('change', async () => {
+  const file = photoInput.files && photoInput.files[0];
+  photoInput.value = '';
+  if (!file) return;
+
+  const isImage = file.type.indexOf('image/') === 0;
+  const isVideo = file.type.indexOf('video/') === 0;
+  if (!isImage && !isVideo) {
+    galleryHint.textContent = 'Escolha uma foto ou vídeo 💭';
+    return;
+  }
+
+  const maxSize = isVideo ? 100 * 1024 * 1024 : 10 * 1024 * 1024;
+  if (file.size > maxSize) {
+    galleryHint.textContent = isVideo ? 'Esse vídeo é grande demais (máx. 100 MB) 💭' : 'Essa foto é grande demais (máx. 10 MB) 💭';
+    return;
+  }
+
+  addPhotoSlot.classList.add('uploading');
+  galleryHint.textContent = isVideo ? 'Enviando seu vídeo... 🎥' : 'Enviando sua memória... 📸';
+
+  const ext = (file.name.split('.').pop() || (isVideo ? 'mp4' : 'jpg')).toLowerCase().replace(/[^a-z0-9]/g, '') || (isVideo ? 'mp4' : 'jpg');
+  const filename = Date.now() + '-' + Math.random().toString(36).slice(2, 8) + '.' + ext;
+  const path = myProfile.pair_id + '/' + filename;
+
+  const { error } = await supabase.storage.from(GALLERY_BUCKET).upload(path, file, { contentType: file.type || undefined });
+  addPhotoSlot.classList.remove('uploading');
+
+  if (error) {
+    console.error('ERRO NO UPLOAD:', error);
+    galleryHint.textContent = error.message || 'Erro no upload';
+    return;
+  }
+
+  galleryHint.textContent = isVideo ? 'vídeo adicionado à galeria 💕' : 'memória adicionada à galeria 💕';
+  const { data: signed } = await supabase.storage.from(GALLERY_BUCKET).createSignedUrl(path, 3600);
+  if (signed) renderMedia(filename, signed.signedUrl, isVideo);
+  setTimeout(() => galleryHint.textContent = '', 3000);
+  notifyPartner(isVideo ? 'Novo vídeo 🎥' : 'Nova memória 📸', (myProfile && myProfile.display_name ? myProfile.display_name : 'Seu amor') + (isVideo ? ' adicionou um vídeo novo à galeria!' : ' adicionou uma foto nova à galeria!'));
+});
+
+/* =========================================================
+   LOGOUT
+   ========================================================= */
+document.getElementById('logoutLink').addEventListener('click', async () => {
+  await supabase.auth.signOut();
+  window.location.href = 'login.html';
+});
+
+/* =========================================================
+   INTRO ANIMATION
+   ========================================================= */
+const html = document.documentElement;
+const page = document.getElementById('page');
+
+function playIntro(onDone) {
+  if (html.classList.contains('skip-intro')) {
+    page.classList.add('reveal');
+    onDone();
+    return;
+  }
+
+  html.classList.add('intro-lock');
+  const overlay = document.getElementById('intro-overlay');
+  const hiBubble = document.getElementById('hiBubble');
+
+  setTimeout(() => overlay.classList.add('eyes-open'), 500);
+  setTimeout(() => hiBubble.classList.add('show'), 1350);
+  setTimeout(() => {
+    overlay.classList.add('blinking');
+    setTimeout(() => overlay.classList.remove('blinking'), 180);
+  }, 2500);
+  setTimeout(() => {
+    overlay.classList.add('hide');
+    page.classList.add('reveal');
+    try { localStorage.setItem('monthsaryIntroSeen', '1'); } catch (e) {}
+    onDone();
+    setTimeout(() => {
+      overlay.remove();
+      html.classList.remove('intro-lock');
+    }, 750);
+  }, 3400);
+}
+
+/* =========================================================
+   BOOT: auth check → load profile/pair/partner → intro → render
+   ========================================================= */
+(async function boot() {
+  const { data: sessionData } = await supabase.auth.getSession();
+  const session = sessionData && sessionData.session;
+  if (!session) {
+    window.location.href = 'login.html';
+    return;
+  }
+  myUserId = session.user.id;
+
+  let { data: profileRow } = await supabase.from('profiles').select('*').eq('user_id', myUserId).maybeSingle();
+
+  if (!profileRow) {
+    const fallbackName = (session.user.email || 'Someone').split('@')[0];
+    const { error: rpcErr } = await supabase.rpc('create_or_join_pair', { p_display_name: fallbackName, p_invite_code: null });
+    if (rpcErr) {
+      document.body.innerHTML = '<p style="padding:60px 24px;text-align:center;font-family:Quicksand,sans-serif;">Something went wrong setting up your account — please try logging in again.</p>';
+      return;
+    }
+    const { data: profileRow2 } = await supabase.from('profiles').select('*').eq('user_id', myUserId).single();
+    profileRow = profileRow2;
+  }
+  myProfile = profileRow;
+
+  const { data: pairRow, error: pairError } = await supabase.from('pairs').select('id,since_date,invite_code').eq('id', myProfile.pair_id).maybeSingle();
+  if (pairError) console.error('Erro ao carregar o casal:', pairError);
+  pairInfo = pairRow;
+  console.log('Pair carregado:', pairInfo);
+
+  const { data: partnerRow } = await supabase.from('profiles').select('*').eq('pair_id', myProfile.pair_id).neq('user_id', myUserId).maybeSingle();
+  partnerProfile = partnerRow;
+
+  document.getElementById('namesHeading').innerHTML =
+    (myProfile.display_name || 'You') + '<span class="amp">&amp;</span>' + (partnerProfile ? partnerProfile.display_name : '...');
+
+  if (pairInfo) {
+    updateDaysTogether(pairInfo.since_date);
+    renderMilestones(pairInfo.since_date);
+  }
+
+  playIntro(async () => {
+    const { data: myMoodRow } = await supabase.from('mood_state').select('mood').eq('user_id', myUserId).maybeSingle();
+    applyMood(myMoodRow ? myMoodRow.mood : 'happy', { silent: true, deterministic: true, fromRemote: true });
+    await refreshPartnerSection();
+    await loadGallery();
+    await updateNotificationDot();
+  });
+})();
+</script>
+</body>
+</html>

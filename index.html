@@ -503,47 +503,6 @@
     color: var(--accent);
   }
 
-  /* =========================================================
-     10. PHOTO / VIDEO GALLERY
-     ========================================================= */
-  .gallery { width: 100%; margin-top: 32px; }
-  .gallery h2 {
-    margin: 0 0 16px;
-    font-family: 'Baloo 2', cursive;
-    font-size: clamp(18px, 5vw, 22px);
-    color: var(--accent);
-  }
-  .photo-row { display: flex; gap: 12px; justify-content: center; flex-wrap: wrap; }
-  .photo-slot {
-    position: relative;
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    justify-content: center;
-    gap: 6px;
-    width: 106px;
-    height: 106px;
-    overflow: hidden;
-    border: 2px dashed var(--accent);
-    border-radius: 20px;
-    background: var(--white);
-    color: var(--accent);
-    font-size: 11px;
-    font-weight: 600;
-    transition: border-color .6s ease, color .6s ease;
-  }
-  .photo-slot img,
-  .photo-slot video {
-    width: 100%;
-    height: 100%;
-    object-fit: cover;
-    border-radius: 18px;
-    cursor: pointer;
-  }
-  .photo-slot svg { width: 28px; height: 28px; opacity: .7; }
-  .photo-slot.add-slot { cursor: pointer; }
-  .photo-slot.add-slot:active { transform: scale(.95); }
-  .photo-slot.uploading { opacity: .55; pointer-events: none; }
   .video-icon {
     position: absolute;
     top: 50%;
@@ -560,39 +519,6 @@
     box-shadow: 0 4px 12px rgba(0, 0, 0, .2);
     pointer-events: none;
     transform: translate(-50%, -50%);
-  }
-  .gallery-hint {
-    margin-top: 10px;
-    min-height: 14px;
-    font-size: 11.5px;
-    color: var(--loose-text);
-    opacity: .8;
-  }
-  .photo-delete {
-    position: absolute;
-    top: 5px;
-    right: 5px;
-    z-index: 2;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    width: 22px;
-    height: 22px;
-    border: none;
-    border-radius: 50%;
-    background: rgba(30, 20, 18, .55);
-    color: #fff;
-    font-size: 12px;
-    line-height: 1;
-    cursor: pointer;
-  }
-  .photo-delete:active { transform: scale(.9); }
-  .photo-delete.confirm {
-    width: auto;
-    padding: 0 8px;
-    background: #E8483D;
-    font-size: 10.5px;
-    font-weight: 700;
   }
 
   /* =========================================================
@@ -790,47 +716,23 @@
     color: var(--loose-text);
     white-space: pre-wrap;
   }
-
-  /* fullscreen photo/video viewer */
-  .lightbox {
-    position: fixed;
-    inset: 0;
-    z-index: 100;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    padding: 28px;
-    background: rgba(20, 14, 12, .86);
-    opacity: 0;
-    pointer-events: none;
-    transition: opacity .25s ease;
-  }
-  .lightbox.show { opacity: 1; pointer-events: auto; }
-  .lightbox img,
-  .lightbox video {
-    max-width: 100%;
-    max-height: 100%;
-    border-radius: 16px;
-    box-shadow: 0 20px 50px rgba(0, 0, 0, .4);
-  }
-  .lightbox video { width: auto; height: auto; background: #000; }
-  .lightbox-close {
-    position: absolute;
-    top: 18px;
-    right: 18px;
-    z-index: 3;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    width: 38px;
-    height: 38px;
-    border: none;
-    border-radius: 50%;
-    background: rgba(255, 255, 255, .92);
-    color: var(--brown);
-    font-size: 17px;
+  .moment-delete-btn {
+    display: block;
+    width: 100%;
+    margin-top: 18px;
+    padding: 11px;
+    border: 1.5px solid #E8483D;
+    border-radius: 14px;
+    background: none;
+    color: #E8483D;
+    font-family: 'Quicksand', sans-serif;
+    font-weight: 700;
+    font-size: 12.5px;
     cursor: pointer;
   }
+  .moment-delete-btn:active { transform: scale(.98); }
+  .moment-delete-btn.confirm { background: #E8483D; color: #fff; }
+  .moment-delete-btn:disabled { opacity: .6; pointer-events: none; }
 
   footer { margin-top: 30px; font-size: 13px; color: var(--loose-text); opacity: .9; }
   footer .signature {
@@ -921,22 +823,6 @@
 
   <a class="playground-link" href="playground.html">🎈 Visite seu mascotinho</a>
 
-  <section class="gallery">
-    <h2>Nossas Pequenas Memórias 📸🎥</h2>
-    <div class="photo-row" id="photoRow">
-      <div class="photo-slot add-slot" id="addPhotoSlot">
-        <svg viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
-          <rect x="3" y="6" width="18" height="14" rx="2" stroke="currentColor" stroke-width="1.6"/>
-          <circle cx="12" cy="13" r="3.2" stroke="currentColor" stroke-width="1.6"/>
-          <path d="M8 6L9.5 3.5H14.5L16 6" stroke="currentColor" stroke-width="1.6"/>
-        </svg>
-        <span>Adicionar memória</span>
-      </div>
-    </div>
-    <input type="file" id="photoInput" accept="image/*,video/*" style="display:none">
-    <p class="gallery-hint" id="galleryHint"></p>
-  </section>
-
   <section class="timeline">
     <h2>📖 Nossa Linha do Tempo</h2>
 
@@ -986,14 +872,9 @@
         </div>
         <div class="moment-overlay-title" id="momentOverlayTitle"></div>
         <div class="moment-overlay-desc" id="momentOverlayDesc"></div>
+        <button type="button" class="moment-delete-btn" id="momentOverlayDelete">🗑️ Excluir momento</button>
       </div>
     </div>
-  </div>
-
-  <div class="lightbox" id="lightbox">
-    <button type="button" class="lightbox-close" id="lightboxClose" aria-label="Fechar">✕</button>
-    <img id="lightboxImg" src="" alt="Uma memória, ampliada">
-    <video id="lightboxVideo" controls playsinline preload="metadata" style="display:none"></video>
   </div>
 
   <footer>
@@ -1288,173 +1169,6 @@ saveDateBtn.addEventListener('click', async () => {
 });
 
 /* =========================================================
-   PHOTO / VIDEO GALLERY
-   ========================================================= */
-const photoRow = document.getElementById('photoRow');
-const addPhotoSlot = document.getElementById('addPhotoSlot');
-const photoInput = document.getElementById('photoInput');
-const galleryHint = document.getElementById('galleryHint');
-
-const lightbox = document.getElementById('lightbox');
-const lightboxImg = document.getElementById('lightboxImg');
-const lightboxVideo = document.getElementById('lightboxVideo');
-const lightboxClose = document.getElementById('lightboxClose');
-
-function openLightbox(src, isVideo) {
-  lightboxImg.style.display = isVideo ? 'none' : '';
-  lightboxVideo.style.display = isVideo ? 'block' : 'none';
-  if (isVideo) {
-    lightboxVideo.src = src;
-    lightboxVideo.currentTime = 0;
-  } else {
-    lightboxVideo.pause();
-    lightboxVideo.removeAttribute('src');
-    lightboxImg.src = src;
-  }
-  lightbox.classList.add('show');
-}
-
-function closeLightbox() {
-  lightboxVideo.pause();
-  lightboxVideo.removeAttribute('src');
-  lightbox.classList.remove('show');
-}
-
-lightboxClose.addEventListener('click', closeLightbox);
-lightbox.addEventListener('click', e => { if (e.target === lightbox) closeLightbox(); });
-
-async function deleteMedia(name, slotEl, delBtn) {
-  delBtn.disabled = true;
-  slotEl.style.opacity = '.4';
-
-  const path = myProfile.pair_id + '/' + name;
-  const { error } = await supabase.storage.from(GALLERY_BUCKET).remove([path]);
-
-  if (error) {
-    slotEl.style.opacity = '1';
-    delBtn.disabled = false;
-    galleryHint.textContent = 'Não foi possível excluir — tente novamente 🥺';
-    return;
-  }
-
-  slotEl.remove();
-  galleryHint.textContent = 'Memória removida 🕊️';
-  setTimeout(() => galleryHint.textContent = '', 2000);
-}
-
-function renderMedia(name, url, isVideo) {
-  const slot = document.createElement('div');
-  slot.className = 'photo-slot';
-
-  if (isVideo) {
-    const video = document.createElement('video');
-    video.src = url;
-    video.muted = true;
-    video.playsInline = true;
-    video.preload = 'metadata';
-    video.addEventListener('loadedmetadata', () => { try { video.currentTime = .01; } catch (e) {} });
-    video.addEventListener('click', () => openLightbox(url, true));
-    slot.appendChild(video);
-
-    const icon = document.createElement('span');
-    icon.className = 'video-icon';
-    icon.textContent = '▶';
-    slot.appendChild(icon);
-  } else {
-    const img = document.createElement('img');
-    img.src = url;
-    img.alt = 'Uma memória';
-    img.loading = 'lazy';
-    img.addEventListener('click', () => openLightbox(url, false));
-    slot.appendChild(img);
-  }
-
-  const delBtn = document.createElement('button');
-  delBtn.type = 'button';
-  delBtn.className = 'photo-delete';
-  delBtn.textContent = '✕';
-  delBtn.setAttribute('aria-label', 'Excluir esta memória');
-  delBtn.addEventListener('click', e => {
-    e.stopPropagation();
-    if (delBtn.classList.contains('confirm')) {
-      deleteMedia(name, slot, delBtn);
-      return;
-    }
-    delBtn.classList.add('confirm');
-    delBtn.textContent = 'excluir?';
-    clearTimeout(delBtn._resetTimer);
-    delBtn._resetTimer = setTimeout(() => {
-      delBtn.classList.remove('confirm');
-      delBtn.textContent = '✕';
-    }, 2500);
-  });
-  slot.appendChild(delBtn);
-
-  photoRow.appendChild(slot);
-}
-
-async function loadGallery() {
-  const { data: files, error } = await supabase.storage
-    .from(GALLERY_BUCKET)
-    .list(myProfile.pair_id, { limit: 100, sortBy: { column: 'created_at', order: 'desc' } });
-  if (error || !files) return;
-
-  photoRow.querySelectorAll('.photo-slot:not(.add-slot)').forEach(el => el.remove());
-
-  for (const f of files) {
-    if (!f.id) continue;
-    const path = myProfile.pair_id + '/' + f.name;
-    const { data: signed } = await supabase.storage.from(GALLERY_BUCKET).createSignedUrl(path, 3600);
-    if (signed) {
-      const isVideo = /\.(mp4|mov|webm|m4v|ogg|avi)$/i.test(f.name.toLowerCase());
-      renderMedia(f.name, signed.signedUrl, isVideo);
-    }
-  }
-}
-
-addPhotoSlot.addEventListener('click', () => photoInput.click());
-
-photoInput.addEventListener('change', async () => {
-  const file = photoInput.files && photoInput.files[0];
-  photoInput.value = '';
-  if (!file) return;
-
-  const isImage = file.type.indexOf('image/') === 0;
-  const isVideo = file.type.indexOf('video/') === 0;
-  if (!isImage && !isVideo) {
-    galleryHint.textContent = 'Escolha uma foto ou vídeo 💭';
-    return;
-  }
-
-  const maxSize = isVideo ? 100 * 1024 * 1024 : 10 * 1024 * 1024;
-  if (file.size > maxSize) {
-    galleryHint.textContent = isVideo ? 'Esse vídeo é grande demais (máx. 100 MB) 💭' : 'Essa foto é grande demais (máx. 10 MB) 💭';
-    return;
-  }
-
-  addPhotoSlot.classList.add('uploading');
-  galleryHint.textContent = isVideo ? 'Enviando seu vídeo... 🎥' : 'Enviando sua memória... 📸';
-
-  const ext = (file.name.split('.').pop() || (isVideo ? 'mp4' : 'jpg')).toLowerCase().replace(/[^a-z0-9]/g, '') || (isVideo ? 'mp4' : 'jpg');
-  const filename = Date.now() + '-' + Math.random().toString(36).slice(2, 8) + '.' + ext;
-  const path = myProfile.pair_id + '/' + filename;
-
-  const { error } = await supabase.storage.from(GALLERY_BUCKET).upload(path, file, { contentType: file.type || undefined });
-  addPhotoSlot.classList.remove('uploading');
-
-  if (error) {
-    console.error('ERRO NO UPLOAD:', error);
-    galleryHint.textContent = error.message || 'Erro no upload';
-    return;
-  }
-
-  galleryHint.textContent = isVideo ? 'vídeo adicionado à galeria 💕' : 'memória adicionada à galeria 💕';
-  const { data: signed } = await supabase.storage.from(GALLERY_BUCKET).createSignedUrl(path, 3600);
-  if (signed) renderMedia(filename, signed.signedUrl, isVideo);
-  setTimeout(() => galleryHint.textContent = '', 3000);
-});
-
-/* =========================================================
    RELATIONSHIP TIMELINE (moments)
    ========================================================= */
 const MOMENTS_TABLE = 'moments';
@@ -1478,6 +1192,9 @@ const momentOverlayTime = document.getElementById('momentOverlayTime');
 const momentOverlayAgo = document.getElementById('momentOverlayAgo');
 const momentOverlayTitle = document.getElementById('momentOverlayTitle');
 const momentOverlayDesc = document.getElementById('momentOverlayDesc');
+const momentOverlayDelete = document.getElementById('momentOverlayDelete');
+
+let currentOverlayMoment = null;
 
 const MONTHS_PT = ['janeiro', 'fevereiro', 'março', 'abril', 'maio', 'junho', 'julho', 'agosto', 'setembro', 'outubro', 'novembro', 'dezembro'];
 
@@ -1526,6 +1243,11 @@ function momentMediaUrlFromPath(path) {
 }
 
 function openMomentOverlay(moment, mediaUrl) {
+  currentOverlayMoment = moment;
+  momentOverlayDelete.classList.remove('confirm');
+  momentOverlayDelete.textContent = '🗑️ Excluir momento';
+  momentOverlayDelete.disabled = false;
+
   const happened = new Date(moment.happened_at);
 
   momentOverlayDate.textContent = '📅 ' + formatMomentDateLong(happened);
@@ -1565,6 +1287,45 @@ function closeMomentOverlay() {
 
 momentOverlayClose.addEventListener('click', closeMomentOverlay);
 momentOverlay.addEventListener('click', e => { if (e.target === momentOverlay) closeMomentOverlay(); });
+
+momentOverlayDelete.addEventListener('click', async () => {
+  if (!currentOverlayMoment) return;
+
+  if (!momentOverlayDelete.classList.contains('confirm')) {
+    momentOverlayDelete.classList.add('confirm');
+    momentOverlayDelete.textContent = 'Tem certeza? Toque de novo para excluir';
+    clearTimeout(momentOverlayDelete._resetTimer);
+    momentOverlayDelete._resetTimer = setTimeout(() => {
+      momentOverlayDelete.classList.remove('confirm');
+      momentOverlayDelete.textContent = '🗑️ Excluir momento';
+    }, 3000);
+    return;
+  }
+
+  momentOverlayDelete.disabled = true;
+  momentOverlayDelete.textContent = 'Excluindo...';
+
+  const moment = currentOverlayMoment;
+
+  if (moment.media_path) {
+    const { error: storageError } = await supabase.storage.from(GALLERY_BUCKET).remove([moment.media_path]);
+    if (storageError) console.error('ERRO AO EXCLUIR ARQUIVO DO MOMENTO:', storageError);
+  }
+
+  const { error } = await supabase.from(MOMENTS_TABLE).delete().eq('id', moment.id);
+
+  if (error) {
+    console.error('ERRO AO EXCLUIR MOMENTO:', error);
+    momentOverlayDelete.disabled = false;
+    momentOverlayDelete.classList.remove('confirm');
+    momentOverlayDelete.textContent = '🗑️ Excluir momento';
+    momentHint.textContent = 'Não foi possível excluir — tente novamente 🥺';
+    return;
+  }
+
+  closeMomentOverlay();
+  await loadMoments();
+});
 
 async function renderMomentCard(moment) {
   const happened = new Date(moment.happened_at);
@@ -1817,7 +1578,6 @@ function playIntro(onDone) {
     const { data: myMoodRow } = await supabase.from('mood_state').select('mood').eq('user_id', myUserId).maybeSingle();
     applyMood(myMoodRow ? myMoodRow.mood : 'happy', { silent: true, deterministic: true, fromRemote: true });
     await refreshPartnerSection();
-    await loadGallery();
     await loadMoments();
   });
 })();

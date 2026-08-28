@@ -1,0 +1,412 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+<title>Twogether — Lugares 🗺️</title>
+
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Baloo+2:wght@500;600;700;800&family=Quicksand:wght@400;500;600;700&display=swap" rel="stylesheet">
+
+<link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" integrity="sha256-p4NxAoJBhIIN+hmNHrzRCf9tD/miZyoHS5obTRR9BMY=" crossorigin="" />
+
+<script src="https://browser.sentry-cdn.com/10.67.0/bundle.min.js"
+  integrity="sha384-XcUJj5iqu49IW8uRaR1JR5XT+Hri4IQkCDLt1Ek9li1Qby2ef+35Ur6/7QXwh1VF"
+  crossorigin="anonymous"></script>
+<script>
+  Sentry.init({ dsn: "https://d22229fe31d1c4d9683482cb0cb69231@o4511733518172160.ingest.us.sentry.io/4511768120000512" });
+</script>
+
+<style>
+  :root { --white: #FFF; --brown: #4A3B33; --ink: #2B2320; }
+  body.mood-happy    { --bg-top: #FDF1E6; --bg-bottom: #FBE4D0; --loose-text: #7A6459; --accent: #FF8FA8; }
+  body.mood-tired    { --bg-top: #EDE7F6; --bg-bottom: #D9CFEA; --loose-text: #6B6079; --accent: #9C8FC2; }
+  body.mood-sad      { --bg-top: #E3EEF9; --bg-bottom: #C9DFF0; --loose-text: #5C7288; --accent: #6FA3D1; }
+  body.mood-mad      { --bg-top: #FFE0D2; --bg-bottom: #FFB99F; --loose-text: #8A4A36; --accent: #FF6B4A; }
+  body.mood-hungry   { --bg-top: #FFF3D6; --bg-bottom: #FFDFA0; --loose-text: #8A6A2C; --accent: #FFA83D; }
+  body.mood-sleepy   { --bg-top: #3A3560; --bg-bottom: #22203E; --loose-text: #CFC9EA; --accent: #9E90D8; }
+  body.mood-excited  { --bg-top: #FFEE9E; --bg-bottom: #FFB3DE; --loose-text: #8A5A72; --accent: #FF5FA8; }
+  body.mood-naughty  { --bg-top: #F1DFFF; --bg-bottom: #FFCCEB; --loose-text: #7A4F8A; --accent: #C463D9; }
+
+  * { box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
+  html, body { margin: 0; padding: 0; min-height: 100%; }
+  body {
+    display: flex;
+    justify-content: center;
+    min-height: 100vh;
+    background: linear-gradient(180deg, var(--bg-top) 0%, var(--bg-bottom) 100%);
+    transition: background .7s ease;
+    font-family: 'Quicksand', sans-serif;
+    color: var(--brown);
+  }
+
+  .site-nav {
+    display: inline-flex; flex-wrap: wrap; justify-content: center; gap: 4px; max-width: 320px;
+    margin-top: 16px; padding: 5px; border-radius: 22px;
+    background: rgba(255,255,255,.55); backdrop-filter: blur(6px);
+  }
+  .site-nav a {
+    padding: 7px 16px; border-radius: 999px; font-family: 'Baloo 2', cursive; font-weight: 600; font-size: 13px;
+    color: var(--loose-text); text-decoration: none; cursor: pointer; transition: background .25s ease, color .25s ease;
+  }
+  .site-nav a.current { background: var(--white); color: var(--accent); box-shadow: 0 3px 8px rgba(0,0,0,.1); }
+
+  .page { width: 100%; max-width: 480px; padding: 32px 20px 48px; text-align: center; }
+  .home-kicker { margin: 0 0 4px; font-size: 11px; font-weight: 700; letter-spacing: 1.5px; text-transform: uppercase; color: var(--loose-text); opacity: .75; }
+  h1.title { margin: 0 0 4px; font-family: 'Baloo 2', cursive; font-size: clamp(22px,6vw,28px); color: var(--accent); }
+  .subtitle { margin: 0 0 18px; font-size: 13px; color: var(--loose-text); }
+
+  .map-frame {
+    position: relative; padding: 10px; border-radius: 26px;
+    background: var(--white); box-shadow: 0 8px 24px rgba(0,0,0,.12); margin-bottom: 10px;
+  }
+  #placesMap { width: 100%; height: 300px; border-radius: 18px; }
+  .leaflet-popup-content { font-family: 'Quicksand', sans-serif; font-size: 13px; }
+
+  .map-badge {
+    position: absolute; top: 20px; right: 20px; z-index: 500;
+    display: flex; align-items: center; gap: 5px;
+    padding: 6px 10px; border-radius: 12px;
+    background: rgba(255,255,255,.92); backdrop-filter: blur(4px);
+    box-shadow: 0 3px 10px rgba(0,0,0,.15);
+    font-family: 'Baloo 2', cursive; font-weight: 700; font-size: 12px; color: var(--accent);
+  }
+  .map-frame .hint-text { margin: 10px 2px 0; text-align: center; }
+
+  .search-row { display: flex; gap: 8px; margin-bottom: 14px; }
+  .search-row input {
+    flex: 1; padding: 10px 12px; border: 1.5px solid #EADFD6; border-radius: 12px;
+    background: #FBF6F1; font-family: 'Quicksand', sans-serif; font-size: 13.5px; color: var(--brown);
+  }
+  .search-row button {
+    padding: 10px 14px; border: none; border-radius: 12px; background: var(--white); color: var(--accent);
+    font-family: 'Baloo 2', cursive; font-weight: 700; font-size: 13px; cursor: pointer; box-shadow: 0 3px 10px rgba(0,0,0,.08);
+  }
+
+  .hint-text { font-size: 12px; color: var(--loose-text); opacity: .85; margin: 0 0 16px; }
+
+  .place-form {
+    display: none;
+    flex-direction: column; gap: 12px; padding: 18px; border-radius: 20px;
+    background: var(--white); box-shadow: 0 8px 24px rgba(0,0,0,.08); text-align: left; margin-bottom: 20px;
+  }
+  .place-form.show { display: flex; }
+  .place-field { display: flex; flex-direction: column; gap: 5px; }
+  .place-field label { font-size: 12.5px; font-weight: 700; color: var(--brown); }
+  .place-field input[type="text"], .place-field input[type="date"], .place-field textarea {
+    padding: 10px 12px; border: 1.5px solid #EADFD6; border-radius: 12px; background: #FBF6F1;
+    font-family: 'Quicksand', sans-serif; font-size: 13.5px; color: var(--brown);
+  }
+  .place-field textarea { resize: vertical; min-height: 56px; }
+  .place-checkbox { display: flex; align-items: center; gap: 8px; font-size: 13px; font-weight: 600; }
+  .place-actions { display: flex; gap: 10px; }
+  .place-actions button {
+    flex: 1; padding: 11px; border: none; border-radius: 14px; font-family: 'Baloo 2', cursive; font-weight: 700; font-size: 14px; cursor: pointer;
+  }
+  #placeSaveBtn { background: var(--accent); color: #fff; }
+  #placeCancelBtn { background: #EFE3DA; color: var(--brown); }
+  .place-hint { min-height: 14px; font-size: 11.5px; color: var(--loose-text); opacity: .85; }
+
+  .places-stats { font-size: 12.5px; color: var(--loose-text); margin: 4px 0 18px; }
+
+  .place-list { display: flex; flex-direction: column; gap: 12px; text-align: left; }
+  .place-card {
+    display: flex; justify-content: space-between; align-items: flex-start; gap: 10px;
+    padding: 14px; border-radius: 16px; background: var(--white); box-shadow: 0 6px 18px rgba(0,0,0,.08); cursor: pointer;
+  }
+  .place-card:active { transform: scale(.99); }
+  .place-name { font-family: 'Baloo 2', cursive; font-size: 15px; color: var(--brown); }
+  .place-name .wishlist-tag { color: var(--accent); font-size: 11px; font-weight: 700; margin-left: 6px; }
+  .place-meta { margin-top: 3px; font-size: 11.5px; color: var(--loose-text); }
+  .place-desc { margin-top: 4px; font-size: 12.5px; color: var(--loose-text); line-height: 1.4; }
+  .place-delete {
+    flex: none; border: none; background: none; color: #E8483D; font-size: 16px; cursor: pointer; padding: 4px;
+  }
+  .place-empty { padding: 24px 10px; text-align: center; font-size: 12.5px; color: var(--loose-text); }
+
+  footer { margin-top: 30px; font-size: 13px; color: var(--loose-text); opacity: .9; }
+</style>
+</head>
+<body class="mood-happy">
+
+<div class="page">
+  <header>
+    <p class="home-kicker">💞 twogether</p>
+    <h1 class="title">🗺️ Lugares que fomos</h1>
+    <p class="subtitle">Cada pino é um pedacinho de vocês dois espalhado pelo mapa</p>
+    <nav class="site-nav">
+      <a href="index.html">🏡 Início</a>
+      <a href="places.html" class="current">🗺️ Lugares</a>
+      <a href="letters.html">💌 Cartas</a>
+      <a href="quotes.html">💬 Frases</a>
+      <a href="playground.html">🎈 Mascotinho</a>
+      <a id="logoutLink">🚪 Saída</a>
+    </nav>
+  </header>
+
+  <div class="search-row">
+    <input type="text" id="searchInput" placeholder="buscar um endereço ou cidade...">
+    <button type="button" id="searchBtn">🔍</button>
+  </div>
+
+  <div class="map-frame">
+    <div class="map-badge" id="mapBadge">📍 0</div>
+    <div id="placesMap"></div>
+    <p class="hint-text">Toque no mapa pra marcar um lugar novo 📍 — ou toque num pino pra ver os detalhes.</p>
+  </div>
+
+  <form class="place-form" id="placeForm">
+    <div class="place-field">
+      <label for="placeName">📍 Nome do lugar</label>
+      <input type="text" id="placeName" placeholder="ex: praia de tal, aquele restaurante..." required maxlength="120">
+    </div>
+    <div class="place-field">
+      <label for="placeDate">📅 Quando foram (opcional)</label>
+      <input type="date" id="placeDate">
+    </div>
+    <div class="place-field">
+      <label for="placeDesc">📝 Conte sobre esse dia</label>
+      <textarea id="placeDesc" maxlength="600" placeholder="o que rolou lá..."></textarea>
+    </div>
+    <label class="place-checkbox"><input type="checkbox" id="placeWishlist"> ✨ ainda não fomos — é um lugar dos sonhos</label>
+    <div class="place-actions">
+      <button type="button" id="placeSaveBtn">💾 Salvar lugar</button>
+      <button type="button" id="placeCancelBtn">Cancelar</button>
+    </div>
+    <p class="place-hint" id="placeHint"></p>
+  </form>
+
+  <p class="places-stats" id="placesStats"></p>
+  <div class="place-list" id="placeList"></div>
+
+  <footer>
+    <p class="signature">👀💕</p>
+  </footer>
+</div>
+
+<script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js" integrity="sha256-20nQCchB9co0qIjJZRGuk2/Z9VM+kNiyxNV1lvTlZBo=" crossorigin=""></script>
+<script type="module">
+import { createClient } from 'https://esm.sh/@supabase/supabase-js@2';
+
+const SUPABASE_URL = "https://uxuplzjsmoilzrobiflh.supabase.co";
+const SUPABASE_ANON_KEY = "sb_publishable_1mKkxDpM7WJvFm1xGVXxBA_5o1x6m9e";
+const supabase = createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+
+// Fallback center if the couple has no places saved yet — adjust to
+// wherever makes sense for you two (this defaults to Brasília-DF).
+const DEFAULT_CENTER = [-15.7801, -47.9292];
+const DEFAULT_ZOOM = 6;
+
+let myUserId = null;
+let myProfile = null;
+let pendingLatLng = null;
+let editingPlace = null;
+let allPlaces = [];
+
+const map = L.map('placesMap').setView(DEFAULT_CENTER, DEFAULT_ZOOM);
+L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+  attribution: '&copy; OpenStreetMap contributors',
+  maxZoom: 19
+}).addTo(map);
+
+const markerLayer = L.layerGroup().addTo(map);
+
+const placeForm = document.getElementById('placeForm');
+const placeName = document.getElementById('placeName');
+const placeDate = document.getElementById('placeDate');
+const placeDesc = document.getElementById('placeDesc');
+const placeWishlist = document.getElementById('placeWishlist');
+const placeSaveBtn = document.getElementById('placeSaveBtn');
+const placeCancelBtn = document.getElementById('placeCancelBtn');
+const placeHint = document.getElementById('placeHint');
+const placeList = document.getElementById('placeList');
+const placesStats = document.getElementById('placesStats');
+const mapBadge = document.getElementById('mapBadge');
+
+function openForm(latlng) {
+  pendingLatLng = latlng;
+  editingPlace = null;
+  placeName.value = '';
+  placeDate.value = '';
+  placeDesc.value = '';
+  placeWishlist.checked = false;
+  placeHint.textContent = '';
+  placeForm.classList.add('show');
+  placeForm.scrollIntoView({ behavior: 'smooth', block: 'center' });
+}
+
+function closeForm() {
+  placeForm.classList.remove('show');
+  pendingLatLng = null;
+  editingPlace = null;
+}
+
+map.on('click', e => openForm(e.latlng));
+placeCancelBtn.addEventListener('click', closeForm);
+
+placeSaveBtn.addEventListener('click', async () => {
+  const name = placeName.value.trim();
+  if (!name || !pendingLatLng || !myProfile) {
+    placeHint.textContent = 'Dá um nome pro lugar 💭';
+    return;
+  }
+
+  placeSaveBtn.disabled = true;
+  placeHint.textContent = 'Salvando...';
+
+  const { error } = await supabase.from('places').insert({
+    pair_id: myProfile.pair_id,
+    author_id: myUserId,
+    name,
+    lat: pendingLatLng.lat,
+    lng: pendingLatLng.lng,
+    visited_at: placeDate.value || null,
+    description: placeDesc.value.trim() || null,
+    wishlist: placeWishlist.checked
+  });
+
+  placeSaveBtn.disabled = false;
+
+  if (error) {
+    console.error('ERRO AO SALVAR LUGAR:', error);
+    placeHint.textContent = 'Não foi possível salvar — tente de novo 🥺';
+    return;
+  }
+
+  closeForm();
+  await loadPlaces();
+});
+
+function renderMarkers() {
+  markerLayer.clearLayers();
+  allPlaces.forEach(place => {
+    const color = place.wishlist ? '#C463D9' : '#FF8FA8';
+    const icon = L.divIcon({
+      className: '',
+      html: '<div style="width:16px;height:16px;border-radius:50%;background:' + color + ';border:2px solid #fff;box-shadow:0 2px 6px rgba(0,0,0,.35)"></div>',
+      iconSize: [16, 16],
+      iconAnchor: [8, 8]
+    });
+    const marker = L.marker([place.lat, place.lng], { icon }).addTo(markerLayer);
+    const dateLine = place.visited_at ? new Date(place.visited_at + 'T00:00:00').toLocaleDateString('pt-BR') : '';
+    marker.bindPopup(
+      '<strong>' + escapeHtml(place.name) + '</strong>' +
+      (place.wishlist ? '<br>✨ lugar dos sonhos' : (dateLine ? '<br>📅 ' + dateLine : '')) +
+      (place.description ? '<br>' + escapeHtml(place.description) : '')
+    );
+  });
+}
+
+function escapeHtml(str) {
+  const div = document.createElement('div');
+  div.textContent = str;
+  return div.innerHTML;
+}
+
+function renderPlaceCard(place) {
+  const card = document.createElement('div');
+  card.className = 'place-card';
+
+  const info = document.createElement('div');
+  const dateLine = place.visited_at ? '📅 ' + new Date(place.visited_at + 'T00:00:00').toLocaleDateString('pt-BR') : '';
+  info.innerHTML =
+    '<div class="place-name">' + escapeHtml(place.name) + (place.wishlist ? '<span class="wishlist-tag">✨ sonho</span>' : '') + '</div>' +
+    (dateLine ? '<div class="place-meta">' + dateLine + '</div>' : '') +
+    (place.description ? '<div class="place-desc"></div>' : '');
+  if (place.description) info.querySelector('.place-desc').textContent = place.description;
+
+  info.addEventListener('click', () => {
+    map.flyTo([place.lat, place.lng], 13);
+  });
+
+  const del = document.createElement('button');
+  del.className = 'place-delete';
+  del.textContent = '🗑️';
+  del.title = 'Excluir lugar';
+  del.addEventListener('click', async (e) => {
+    e.stopPropagation();
+    if (!confirm('Excluir "' + place.name + '"?')) return;
+    const { error } = await supabase.from('places').delete().eq('id', place.id);
+    if (error) { console.error('ERRO AO EXCLUIR LUGAR:', error); return; }
+    await loadPlaces();
+  });
+
+  card.appendChild(info);
+  card.appendChild(del);
+  return card;
+}
+
+async function loadPlaces() {
+  placeList.innerHTML = '<div class="place-empty">Carregando lugares... 🗺️</div>';
+
+  const { data, error } = await supabase.from('places').select('*').order('visited_at', { ascending: false, nullsFirst: false });
+
+  if (error) {
+    console.error('ERRO AO CARREGAR LUGARES:', error);
+    placeList.innerHTML = '<div class="place-empty">Não foi possível carregar 😢</div>';
+    return;
+  }
+
+  allPlaces = data || [];
+  renderMarkers();
+
+  const visitedCount = allPlaces.filter(p => !p.wishlist).length;
+  const wishlistCount = allPlaces.filter(p => p.wishlist).length;
+  placesStats.textContent = visitedCount + (visitedCount === 1 ? ' lugar visitado' : ' lugares visitados') +
+    (wishlistCount ? ' • ' + wishlistCount + (wishlistCount === 1 ? ' no desejo ✨' : ' no desejo ✨') : '');
+  mapBadge.textContent = '📍 ' + visitedCount;
+
+  placeList.innerHTML = '';
+  if (!allPlaces.length) {
+    placeList.innerHTML = '<div class="place-empty">Nenhum lugar ainda — toque no mapa pra adicionar o primeiro 💕</div>';
+    return;
+  }
+  allPlaces.forEach(p => placeList.appendChild(renderPlaceCard(p)));
+
+  if (allPlaces.length) {
+    const bounds = L.latLngBounds(allPlaces.map(p => [p.lat, p.lng]));
+    map.fitBounds(bounds, { padding: [30, 30], maxZoom: 12 });
+  }
+}
+
+document.getElementById('searchBtn').addEventListener('click', doSearch);
+document.getElementById('searchInput').addEventListener('keydown', e => { if (e.key === 'Enter') doSearch(); });
+
+async function doSearch() {
+  const q = document.getElementById('searchInput').value.trim();
+  if (!q) return;
+  try {
+    const res = await fetch('https://nominatim.openstreetmap.org/search?format=json&limit=1&q=' + encodeURIComponent(q));
+    const results = await res.json();
+    if (!results.length) { alert('Não achei esse lugar 😕'); return; }
+    const { lat, lon } = results[0];
+    map.flyTo([parseFloat(lat), parseFloat(lon)], 14);
+  } catch (e) {
+    console.error('ERRO NA BUSCA DE ENDEREÇO:', e);
+  }
+}
+
+document.getElementById('logoutLink').addEventListener('click', async () => {
+  await supabase.auth.signOut();
+  window.location.href = 'login.html';
+});
+
+(async function boot() {
+  const { data: sessionData } = await supabase.auth.getSession();
+  const session = sessionData && sessionData.session;
+  if (!session) { window.location.href = 'login.html'; return; }
+  myUserId = session.user.id;
+
+  const { data: profileRow } = await supabase.from('profiles').select('*').eq('user_id', myUserId).maybeSingle();
+  if (!profileRow) { window.location.href = 'index.html'; return; }
+  myProfile = profileRow;
+
+  const { data: myMoodRow } = await supabase.from('mood_state').select('mood').eq('user_id', myUserId).maybeSingle();
+  if (myMoodRow && myMoodRow.mood) document.body.className = 'mood-' + myMoodRow.mood;
+
+  await loadPlaces();
+})();
+</script>
+</body>
+</html>

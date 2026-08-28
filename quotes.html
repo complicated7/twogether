@@ -1,0 +1,486 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+<title>Twogether — Nossas frases 💬</title>
+
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Baloo+2:wght@500;600;700;800&family=Quicksand:wght@400;500;600;700&display=swap" rel="stylesheet">
+
+<script src="https://browser.sentry-cdn.com/10.67.0/bundle.min.js"
+  integrity="sha384-XcUJj5iqu49IW8uRaR1JR5XT+Hri4IQkCDLt1Ek9li1Qby2ef+35Ur6/7QXwh1VF"
+  crossorigin="anonymous"></script>
+<script>
+  Sentry.init({ dsn: "https://d22229fe31d1c4d9683482cb0cb69231@o4511733518172160.ingest.us.sentry.io/4511768120000512" });
+</script>
+
+<style>
+  :root { --white: #FFF; --brown: #4A3B33; --ink: #2B2320; }
+  body.mood-happy    { --bg-top: #FDF1E6; --bg-bottom: #FBE4D0; --loose-text: #7A6459; --accent: #FF8FA8; }
+  body.mood-tired    { --bg-top: #EDE7F6; --bg-bottom: #D9CFEA; --loose-text: #6B6079; --accent: #9C8FC2; }
+  body.mood-sad      { --bg-top: #E3EEF9; --bg-bottom: #C9DFF0; --loose-text: #5C7288; --accent: #6FA3D1; }
+  body.mood-mad      { --bg-top: #FFE0D2; --bg-bottom: #FFB99F; --loose-text: #8A4A36; --accent: #FF6B4A; }
+  body.mood-hungry   { --bg-top: #FFF3D6; --bg-bottom: #FFDFA0; --loose-text: #8A6A2C; --accent: #FFA83D; }
+  body.mood-sleepy   { --bg-top: #3A3560; --bg-bottom: #22203E; --loose-text: #CFC9EA; --accent: #9E90D8; }
+  body.mood-excited  { --bg-top: #FFEE9E; --bg-bottom: #FFB3DE; --loose-text: #8A5A72; --accent: #FF5FA8; }
+  body.mood-naughty  { --bg-top: #F1DFFF; --bg-bottom: #FFCCEB; --loose-text: #7A4F8A; --accent: #C463D9; }
+
+  * { box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
+  html, body { margin: 0; padding: 0; min-height: 100%; }
+  body {
+    display: flex; justify-content: center; min-height: 100vh;
+    background: linear-gradient(180deg, var(--bg-top) 0%, var(--bg-bottom) 100%);
+    transition: background .7s ease; font-family: 'Quicksand', sans-serif; color: var(--brown);
+  }
+
+  .site-nav {
+    display: inline-flex; flex-wrap: wrap; justify-content: center; gap: 4px; max-width: 320px;
+    margin-top: 16px; padding: 5px; border-radius: 22px; background: rgba(255,255,255,.55); backdrop-filter: blur(6px);
+  }
+  .site-nav a {
+    padding: 7px 16px; border-radius: 999px; font-family: 'Baloo 2', cursive; font-weight: 600; font-size: 13px;
+    color: var(--loose-text); text-decoration: none; cursor: pointer;
+  }
+  .site-nav a.current { background: var(--white); color: var(--accent); box-shadow: 0 3px 8px rgba(0,0,0,.1); }
+
+  .page { width: 100%; max-width: 480px; padding: 32px 20px 48px; text-align: center; }
+  .home-kicker { margin: 0 0 4px; font-size: 11px; font-weight: 700; letter-spacing: 1.5px; text-transform: uppercase; color: var(--loose-text); opacity: .75; }
+  h1.title { margin: 0 0 4px; font-family: 'Baloo 2', cursive; font-size: clamp(22px,6vw,28px); color: var(--accent); }
+  .subtitle { margin: 0 0 18px; font-size: 13px; color: var(--loose-text); }
+
+  .card-box {
+    padding: 18px; border-radius: 20px; background: var(--white); box-shadow: 0 8px 24px rgba(0,0,0,.08); margin-bottom: 20px; text-align: left;
+  }
+
+  .type-toggle { display: flex; gap: 8px; margin-bottom: 14px; }
+  .type-btn {
+    flex: 1; padding: 9px 4px; border: 1.5px solid #EADFD6; border-radius: 12px; background: #FBF6F1;
+    font-family: 'Quicksand', sans-serif; font-weight: 700; font-size: 12.5px; color: var(--brown); cursor: pointer;
+  }
+  .type-btn.active { border-color: var(--accent); background: #fff; color: var(--accent); }
+
+  .field { display: flex; flex-direction: column; gap: 5px; margin-bottom: 12px; }
+  .field label { font-size: 12.5px; font-weight: 700; color: var(--brown); }
+  .field textarea, .field input[type="text"], .field select {
+    padding: 10px 12px; border: 1.5px solid #EADFD6; border-radius: 12px; background: #FBF6F1;
+    font-family: 'Quicksand', sans-serif; font-size: 13.5px; color: var(--brown);
+  }
+  .field textarea { resize: vertical; min-height: 70px; }
+
+  .record-preview { width: 100%; margin-bottom: 12px; }
+
+  .save-btn {
+    width: 100%; padding: 12px; border: none; border-radius: 14px; background: var(--accent); color: #fff;
+    font-family: 'Baloo 2', cursive; font-weight: 700; font-size: 15px; cursor: pointer;
+  }
+  .save-btn:disabled { opacity: .6; pointer-events: none; }
+  .form-hint { min-height: 14px; margin-top: 8px; font-size: 11.5px; color: var(--loose-text); }
+
+  .quote-list { display: flex; flex-direction: column; gap: 14px; text-align: left; }
+  .quote-card {
+    padding: 16px; border-radius: 18px; background: var(--white); box-shadow: 0 6px 18px rgba(0,0,0,.08);
+  }
+  .quote-text { font-family: 'Baloo 2', cursive; font-size: 16px; color: var(--brown); line-height: 1.4; }
+  .quote-text::before { content: '“'; color: var(--accent); }
+  .quote-text::after { content: '”'; color: var(--accent); }
+  .quote-audio { width: 100%; margin-top: 6px; }
+  .quote-image { width: 100%; border-radius: 14px; margin-top: 4px; cursor: zoom-in; display: block; }
+  .quote-meta { margin-top: 8px; font-size: 11px; color: var(--loose-text); display: flex; justify-content: space-between; align-items: center; }
+  .quote-delete { border: none; background: none; color: #E8483D; font-size: 15px; cursor: pointer; }
+  .quote-empty { padding: 24px 10px; text-align: center; font-size: 12.5px; color: var(--loose-text); }
+
+  .field input[type="file"] {
+    padding: 9px 10px; border: 1.5px dashed #EADFD6; border-radius: 12px; background: #FBF6F1;
+    font-family: 'Quicksand', sans-serif; font-size: 12.5px; color: var(--loose-text);
+  }
+  .image-preview { width: 100%; max-height: 220px; object-fit: cover; border-radius: 14px; margin-bottom: 12px; display: block; }
+
+  footer { margin-top: 30px; font-size: 13px; color: var(--loose-text); opacity: .9; text-align: center; }
+
+  .image-modal-overlay {
+    display: none; position: fixed; inset: 0; background: rgba(0,0,0,.78);
+    z-index: 999; align-items: center; justify-content: center; padding: 20px;
+  }
+  .image-modal-overlay.open { display: flex; }
+  .image-modal { position: relative; max-width: 480px; width: 100%; max-height: 88vh; }
+  .image-modal img { width: 100%; max-height: 88vh; object-fit: contain; border-radius: 16px; display: block; }
+  .image-modal-close {
+    position: absolute; top: -14px; right: -14px; width: 32px; height: 32px; border: none; border-radius: 50%;
+    background: var(--white); color: var(--brown); font-size: 14px; cursor: pointer; box-shadow: 0 4px 12px rgba(0,0,0,.25);
+  }
+</style>
+</head>
+<body class="mood-happy">
+
+<div class="page">
+  <header>
+    <p class="home-kicker">💞 twogether</p>
+    <h1 class="title">💬 Nossas frases</h1>
+    <p class="subtitle">Aquelas falas que a gente não pode deixar esquecer</p>
+    <nav class="site-nav">
+      <a href="index.html">🏡 Início</a>
+      <a href="places.html">🗺️ Lugares</a>
+      <a href="letters.html">💌 Cartas</a>
+      <a href="quotes.html" class="current">💬 Frases</a>
+      <a href="playground.html">🎈 Mascotinho</a>
+      <a id="logoutLink">🚪 Saída</a>
+    </nav>
+  </header>
+
+  <div class="card-box">
+    <div class="type-toggle">
+      <button type="button" class="type-btn active" data-type="text">✏️ Texto</button>
+      <button type="button" class="type-btn" data-type="image">🖼️ Print</button>
+      <button type="button" class="type-btn" data-type="audio">🎙️ Áudio</button>
+    </div>
+
+    <div id="textFields">
+      <div class="field">
+        <label for="quoteText">💬 A frase</label>
+        <textarea id="quoteText" maxlength="500" placeholder="ex: nunca mais compro pizza de novo... (2 minutos depois pedindo pizza de novo)"></textarea>
+      </div>
+    </div>
+
+    <div id="imageFields" style="display:none">
+      <img class="image-preview" id="quoteImagePreview" style="display:none">
+      <div class="field">
+        <label for="quoteImageInput">🖼️ Print da conversa</label>
+        <input type="file" id="quoteImageInput" accept="image/*">
+      </div>
+    </div>
+
+    <div id="audioFields" style="display:none">
+      <audio class="record-preview" id="quoteAudioPreview" controls style="display:none"></audio>
+      <div class="field">
+        <label for="quoteAudioInput">🎙️ Arquivo de áudio</label>
+        <input type="file" id="quoteAudioInput" accept="audio/*">
+      </div>
+    </div>
+
+    <div class="field">
+      <label for="quoteSaidBy">🗣️ Quem falou?</label>
+      <select id="quoteSaidBy">
+        <option value="me">Eu</option>
+        <option value="partner">Meu amor</option>
+      </select>
+    </div>
+
+    <div class="field">
+      <label for="quoteContext" id="quoteContextLabel">📝 Contexto (opcional)</label>
+      <input type="text" id="quoteContext" maxlength="200" placeholder="quando/onde isso rolou...">
+    </div>
+
+    <button type="button" class="save-btn" id="quoteSaveBtn">💾 Guardar frase</button>
+    <p class="form-hint" id="quoteHint"></p>
+  </div>
+
+  <div class="quote-list" id="quoteList"></div>
+
+  <footer><p class="signature">👀💕</p></footer>
+</div>
+
+<div class="image-modal-overlay" id="imageModalOverlay">
+  <div class="image-modal">
+    <button type="button" class="image-modal-close" id="imageModalClose">✕</button>
+    <img id="imageModalImg" src="">
+  </div>
+</div>
+
+<script type="module">
+import { createClient } from 'https://esm.sh/@supabase/supabase-js@2';
+
+const SUPABASE_URL = "https://uxuplzjsmoilzrobiflh.supabase.co";
+const SUPABASE_ANON_KEY = "sb_publishable_1mKkxDpM7WJvFm1xGVXxBA_5o1x6m9e";
+const supabase = createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+const GALLERY_BUCKET = 'gallery-photos';
+
+let myUserId = null;
+let myProfile = null;
+let partnerProfile = null;
+let selectedType = 'text';
+let selectedImageFile = null;
+let selectedAudioFile = null;
+
+const contextLabels = {
+  text: '📝 Contexto (opcional)',
+  image: '📝 O que rolou (opcional)',
+  audio: '📝 Contexto (opcional)'
+};
+const contextPlaceholders = {
+  text: 'quando/onde isso rolou...',
+  image: 'o que rolou nessa conversa...',
+  audio: 'quando/onde isso rolou...'
+};
+
+/* ---------------- type toggle ---------------- */
+document.querySelectorAll('.type-btn').forEach(btn => {
+  btn.addEventListener('click', () => {
+    document.querySelectorAll('.type-btn').forEach(b => b.classList.remove('active'));
+    btn.classList.add('active');
+    selectedType = btn.dataset.type;
+    document.getElementById('textFields').style.display = selectedType === 'text' ? '' : 'none';
+    document.getElementById('imageFields').style.display = selectedType === 'image' ? '' : 'none';
+    document.getElementById('audioFields').style.display = selectedType === 'audio' ? '' : 'none';
+    document.getElementById('quoteContextLabel').textContent = contextLabels[selectedType];
+    document.getElementById('quoteContext').placeholder = contextPlaceholders[selectedType];
+  });
+});
+
+/* ---------------- seleção de arquivos (print e áudio já prontos) ---------------- */
+const quoteImageInput = document.getElementById('quoteImageInput');
+const quoteImagePreview = document.getElementById('quoteImagePreview');
+quoteImageInput.addEventListener('change', () => {
+  selectedImageFile = quoteImageInput.files[0] || null;
+  if (selectedImageFile) {
+    quoteImagePreview.src = URL.createObjectURL(selectedImageFile);
+    quoteImagePreview.style.display = '';
+  } else {
+    quoteImagePreview.style.display = 'none';
+  }
+});
+
+const quoteAudioInput = document.getElementById('quoteAudioInput');
+const quoteAudioPreview = document.getElementById('quoteAudioPreview');
+quoteAudioInput.addEventListener('change', () => {
+  selectedAudioFile = quoteAudioInput.files[0] || null;
+  if (selectedAudioFile) {
+    quoteAudioPreview.src = URL.createObjectURL(selectedAudioFile);
+    quoteAudioPreview.style.display = '';
+  } else {
+    quoteAudioPreview.style.display = 'none';
+  }
+});
+
+/* ---------------- save ---------------- */
+document.getElementById('quoteSaveBtn').addEventListener('click', async () => {
+  const hint = document.getElementById('quoteHint');
+  const btn = document.getElementById('quoteSaveBtn');
+  const saidBySel = document.getElementById('quoteSaidBy').value;
+  const context = document.getElementById('quoteContext').value.trim();
+
+  const saidBy = saidBySel === 'me' ? myUserId : (partnerProfile ? partnerProfile.user_id : null);
+
+  if (selectedType === 'text') {
+    const text = document.getElementById('quoteText').value.trim();
+    if (!text) { hint.textContent = 'Escreve a frase antes 💭'; return; }
+
+    btn.disabled = true;
+    hint.textContent = 'Guardando...';
+
+    const { error } = await supabase.from('quotes').insert({
+      pair_id: myProfile.pair_id,
+      author_id: myUserId,
+      said_by: saidBy,
+      type: 'text',
+      content: text,
+      context: context || null
+    });
+
+    btn.disabled = false;
+    if (error) { console.error('ERRO AO SALVAR FRASE:', error); hint.textContent = 'Não foi possível salvar — tente de novo 🥺'; return; }
+
+    document.getElementById('quoteText').value = '';
+    hint.textContent = 'Frase guardada! 💕';
+    setTimeout(() => hint.textContent = '', 3000);
+    await loadQuotes();
+    return;
+  }
+
+  // print (imagem)
+  if (selectedType === 'image') {
+    if (!selectedImageFile) { hint.textContent = 'Escolhe um print antes 💭'; return; }
+
+    btn.disabled = true;
+    hint.textContent = 'Enviando print...';
+
+    const ext = (selectedImageFile.name.split('.').pop() || 'jpg').toLowerCase();
+    const filename = Date.now() + '-' + Math.random().toString(36).slice(2, 8) + '.' + ext;
+    const imagePath = myProfile.pair_id + '/quotes/' + filename;
+
+    const { error: uploadError } = await supabase.storage.from(GALLERY_BUCKET).upload(imagePath, selectedImageFile, { contentType: selectedImageFile.type || 'image/jpeg' });
+    if (uploadError) {
+      console.error('ERRO NO UPLOAD DO PRINT:', uploadError);
+      hint.textContent = 'Não foi possível enviar o print 🥺';
+      btn.disabled = false;
+      return;
+    }
+
+    const { error } = await supabase.from('quotes').insert({
+      pair_id: myProfile.pair_id,
+      author_id: myUserId,
+      said_by: saidBy,
+      type: 'image',
+      image_path: imagePath,
+      context: context || null
+    });
+
+    btn.disabled = false;
+    if (error) { console.error('ERRO AO SALVAR PRINT:', error); hint.textContent = 'Não foi possível salvar — tente de novo 🥺'; return; }
+
+    selectedImageFile = null;
+    quoteImageInput.value = '';
+    quoteImagePreview.style.display = 'none';
+    hint.textContent = 'Print guardado! 💕';
+    setTimeout(() => hint.textContent = '', 3000);
+    await loadQuotes();
+    return;
+  }
+
+  // audio (arquivo já pronto, sem gravar aqui)
+  if (!selectedAudioFile) { hint.textContent = 'Escolhe um arquivo de áudio antes 💭'; return; }
+
+  btn.disabled = true;
+  hint.textContent = 'Enviando áudio...';
+
+  const audioExt = (selectedAudioFile.name.split('.').pop() || 'mp3').toLowerCase();
+  const filename = Date.now() + '-' + Math.random().toString(36).slice(2, 8) + '.' + audioExt;
+  const audioPath = myProfile.pair_id + '/quotes/' + filename;
+
+  const { error: uploadError } = await supabase.storage.from(GALLERY_BUCKET).upload(audioPath, selectedAudioFile, { contentType: selectedAudioFile.type || 'audio/mpeg' });
+  if (uploadError) {
+    console.error('ERRO NO UPLOAD DO ÁUDIO:', uploadError);
+    hint.textContent = 'Não foi possível enviar o áudio 🥺';
+    btn.disabled = false;
+    return;
+  }
+
+  const { error } = await supabase.from('quotes').insert({
+    pair_id: myProfile.pair_id,
+    author_id: myUserId,
+    said_by: saidBy,
+    type: 'audio',
+    audio_path: audioPath,
+    context: context || null
+  });
+
+  btn.disabled = false;
+  if (error) { console.error('ERRO AO SALVAR FRASE EM ÁUDIO:', error); hint.textContent = 'Não foi possível salvar — tente de novo 🥺'; return; }
+
+  selectedAudioFile = null;
+  quoteAudioInput.value = '';
+  quoteAudioPreview.style.display = 'none';
+  hint.textContent = 'Áudio guardado! 💕';
+  setTimeout(() => hint.textContent = '', 3000);
+  await loadQuotes();
+});
+
+/* ---------------- list ---------------- */
+function escapeHtml(str) {
+  const div = document.createElement('div');
+  div.textContent = str;
+  return div.innerHTML;
+}
+
+function nameFor(userId) {
+  if (userId === myUserId) return myProfile.display_name || 'Você';
+  if (partnerProfile && userId === partnerProfile.user_id) return partnerProfile.display_name || 'Seu amor';
+  return 'Alguém';
+}
+
+async function loadQuotes() {
+  const list = document.getElementById('quoteList');
+  list.innerHTML = '<div class="quote-empty">Carregando... 💬</div>';
+
+  const { data, error } = await supabase.from('quotes').select('*').order('created_at', { ascending: false });
+
+  if (error) { console.error('ERRO AO CARREGAR FRASES:', error); list.innerHTML = '<div class="quote-empty">Não foi possível carregar 😢</div>'; return; }
+
+  list.innerHTML = '';
+  if (!data || !data.length) {
+    list.innerHTML = '<div class="quote-empty">Nenhuma frase guardada ainda 💭</div>';
+    return;
+  }
+
+  for (const q of data) {
+    const card = document.createElement('div');
+    card.className = 'quote-card';
+
+    const when = new Date(q.created_at).toLocaleDateString('pt-BR');
+    const who = q.said_by ? nameFor(q.said_by) : null;
+
+    let bodyHtml = '';
+    if (q.type === 'text') {
+      bodyHtml = '<p class="quote-text">' + escapeHtml(q.content) + '</p>';
+    }
+
+    card.innerHTML = bodyHtml +
+      '<div class="quote-meta"><span>' + (who ? who + ' • ' : '') + when + (q.context ? ' • ' + escapeHtml(q.context) : '') + '</span></div>';
+
+    if (q.type === 'audio' && q.audio_path) {
+      const { data: signed } = await supabase.storage.from(GALLERY_BUCKET).createSignedUrl(q.audio_path, 3600);
+      if (signed && signed.signedUrl) {
+        const audio = document.createElement('audio');
+        audio.className = 'quote-audio';
+        audio.controls = true;
+        audio.src = signed.signedUrl;
+        card.insertBefore(audio, card.querySelector('.quote-meta'));
+      }
+    }
+
+    if (q.type === 'image' && q.image_path) {
+      const { data: signed } = await supabase.storage.from(GALLERY_BUCKET).createSignedUrl(q.image_path, 3600);
+      if (signed && signed.signedUrl) {
+        const img = document.createElement('img');
+        img.className = 'quote-image';
+        img.src = signed.signedUrl;
+        img.loading = 'lazy';
+        img.addEventListener('click', () => openQuoteImageModal(signed.signedUrl));
+        card.insertBefore(img, card.querySelector('.quote-meta'));
+      }
+    }
+
+    const del = document.createElement('button');
+    del.className = 'quote-delete';
+    del.textContent = '🗑️';
+    del.addEventListener('click', async () => {
+      if (!confirm('Apagar essa frase?')) return;
+      if (q.audio_path) await supabase.storage.from(GALLERY_BUCKET).remove([q.audio_path]);
+      if (q.image_path) await supabase.storage.from(GALLERY_BUCKET).remove([q.image_path]);
+      await supabase.from('quotes').delete().eq('id', q.id);
+      await loadQuotes();
+    });
+    card.querySelector('.quote-meta').appendChild(del);
+
+    list.appendChild(card);
+  }
+}
+
+/* ---------------- modal do print ---------------- */
+const imageModalOverlay = document.getElementById('imageModalOverlay');
+function openQuoteImageModal(url) {
+  document.getElementById('imageModalImg').src = url;
+  imageModalOverlay.classList.add('open');
+}
+document.getElementById('imageModalClose').addEventListener('click', () => imageModalOverlay.classList.remove('open'));
+imageModalOverlay.addEventListener('click', (e) => {
+  if (e.target === imageModalOverlay) imageModalOverlay.classList.remove('open');
+});
+
+document.getElementById('logoutLink').addEventListener('click', async () => {
+  await supabase.auth.signOut();
+  window.location.href = 'login.html';
+});
+
+(async function boot() {
+  const { data: sessionData } = await supabase.auth.getSession();
+  const session = sessionData && sessionData.session;
+  if (!session) { window.location.href = 'login.html'; return; }
+  myUserId = session.user.id;
+
+  const { data: profileRow } = await supabase.from('profiles').select('*').eq('user_id', myUserId).maybeSingle();
+  if (!profileRow) { window.location.href = 'index.html'; return; }
+  myProfile = profileRow;
+
+  const { data: partnerRow } = await supabase.from('profiles').select('*').eq('pair_id', myProfile.pair_id).neq('user_id', myUserId).maybeSingle();
+  partnerProfile = partnerRow;
+
+  const { data: myMoodRow } = await supabase.from('mood_state').select('mood').eq('user_id', myUserId).maybeSingle();
+  if (myMoodRow && myMoodRow.mood) document.body.className = 'mood-' + myMoodRow.mood;
+
+  await loadQuotes();
+})();
+</script>
+</body>
+</html>

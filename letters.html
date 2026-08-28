@@ -1,0 +1,552 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+<title>Twogether — Cartas 💌</title>
+
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Baloo+2:wght@500;600;700;800&family=Quicksand:wght@400;500;600;700&display=swap" rel="stylesheet">
+
+<script src="https://browser.sentry-cdn.com/10.67.0/bundle.min.js"
+  integrity="sha384-XcUJj5iqu49IW8uRaR1JR5XT+Hri4IQkCDLt1Ek9li1Qby2ef+35Ur6/7QXwh1VF"
+  crossorigin="anonymous"></script>
+<script>
+  Sentry.init({ dsn: "https://d22229fe31d1c4d9683482cb0cb69231@o4511733518172160.ingest.us.sentry.io/4511768120000512" });
+</script>
+
+<style>
+  :root { --white: #FFF; --brown: #4A3B33; --ink: #2B2320; }
+  body.mood-happy    { --bg-top: #FDF1E6; --bg-bottom: #FBE4D0; --loose-text: #7A6459; --accent: #FF8FA8; }
+  body.mood-tired    { --bg-top: #EDE7F6; --bg-bottom: #D9CFEA; --loose-text: #6B6079; --accent: #9C8FC2; }
+  body.mood-sad      { --bg-top: #E3EEF9; --bg-bottom: #C9DFF0; --loose-text: #5C7288; --accent: #6FA3D1; }
+  body.mood-mad      { --bg-top: #FFE0D2; --bg-bottom: #FFB99F; --loose-text: #8A4A36; --accent: #FF6B4A; }
+  body.mood-hungry   { --bg-top: #FFF3D6; --bg-bottom: #FFDFA0; --loose-text: #8A6A2C; --accent: #FFA83D; }
+  body.mood-sleepy   { --bg-top: #3A3560; --bg-bottom: #22203E; --loose-text: #CFC9EA; --accent: #9E90D8; }
+  body.mood-excited  { --bg-top: #FFEE9E; --bg-bottom: #FFB3DE; --loose-text: #8A5A72; --accent: #FF5FA8; }
+  body.mood-naughty  { --bg-top: #F1DFFF; --bg-bottom: #FFCCEB; --loose-text: #7A4F8A; --accent: #C463D9; }
+
+  * { box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
+  html, body { margin: 0; padding: 0; min-height: 100%; }
+  body {
+    display: flex; justify-content: center; min-height: 100vh;
+    background: linear-gradient(180deg, var(--bg-top) 0%, var(--bg-bottom) 100%);
+    transition: background .7s ease; font-family: 'Quicksand', sans-serif; color: var(--brown);
+  }
+
+  .site-nav {
+    display: inline-flex; flex-wrap: wrap; justify-content: center; gap: 4px; max-width: 320px;
+    margin-top: 16px; padding: 5px; border-radius: 22px; background: rgba(255,255,255,.55); backdrop-filter: blur(6px);
+  }
+  .site-nav a {
+    padding: 7px 16px; border-radius: 999px; font-family: 'Baloo 2', cursive; font-weight: 600; font-size: 13px;
+    color: var(--loose-text); text-decoration: none; cursor: pointer;
+  }
+  .site-nav a.current { background: var(--white); color: var(--accent); box-shadow: 0 3px 8px rgba(0,0,0,.1); }
+
+  .page { width: 100%; max-width: 480px; padding: 32px 20px 48px; text-align: center; }
+  .home-kicker { margin: 0 0 4px; font-size: 11px; font-weight: 700; letter-spacing: 1.5px; text-transform: uppercase; color: var(--loose-text); opacity: .75; }
+  h1.title { margin: 0 0 4px; font-family: 'Baloo 2', cursive; font-size: clamp(22px,6vw,28px); color: var(--accent); }
+  .subtitle { margin: 0 0 18px; font-size: 13px; color: var(--loose-text); }
+
+  .tabs { display: flex; gap: 6px; margin-bottom: 18px; }
+  .tab-btn {
+    flex: 1; padding: 9px 4px; border: none; border-radius: 12px; background: rgba(255,255,255,.55);
+    font-family: 'Baloo 2', cursive; font-weight: 700; font-size: 11.5px; color: var(--loose-text); cursor: pointer;
+  }
+  .tab-btn.active { background: var(--white); color: var(--accent); box-shadow: 0 3px 10px rgba(0,0,0,.1); }
+
+  .tab-panel { display: none; text-align: left; }
+  .tab-panel.active { display: block; }
+
+  .card-box {
+    padding: 18px; border-radius: 20px; background: var(--white); box-shadow: 0 8px 24px rgba(0,0,0,.08); margin-bottom: 16px;
+  }
+  .field { display: flex; flex-direction: column; gap: 5px; margin-bottom: 12px; }
+  .field label { font-size: 12.5px; font-weight: 700; color: var(--brown); }
+  .field textarea, .field input[type="date"], .field input[type="time"], .field select {
+    padding: 10px 12px; border: 1.5px solid #EADFD6; border-radius: 12px; background: #FBF6F1;
+    font-family: 'Quicksand', sans-serif; font-size: 13.5px; color: var(--brown);
+  }
+  .field textarea { resize: vertical; min-height: 100px; }
+  .field label.field-sublabel { margin-top: 4px; }
+
+  .delivery-options { display: flex; gap: 8px; margin-bottom: 12px; }
+  .delivery-btn {
+    flex: 1; padding: 9px 4px; border: 1.5px solid #EADFD6; border-radius: 12px; background: #FBF6F1;
+    font-family: 'Quicksand', sans-serif; font-weight: 700; font-size: 11px; color: var(--brown); cursor: pointer; text-align: center;
+  }
+  .delivery-btn.active { border-color: var(--accent); background: #fff; color: var(--accent); }
+
+  .save-btn {
+    width: 100%; padding: 12px; border: none; border-radius: 14px; background: var(--accent); color: #fff;
+    font-family: 'Baloo 2', cursive; font-weight: 700; font-size: 15px; cursor: pointer;
+  }
+  .save-btn:disabled { opacity: .6; pointer-events: none; }
+  .form-hint { min-height: 14px; margin-top: 8px; font-size: 11.5px; color: var(--loose-text); }
+
+  .letter-list { display: flex; flex-direction: column; gap: 12px; }
+  .letter-card {
+    padding: 16px; border-radius: 18px; background: var(--white); box-shadow: 0 6px 18px rgba(0,0,0,.08); cursor: pointer;
+  }
+  .letter-card.locked { opacity: .75; }
+  .letter-top { display: flex; justify-content: space-between; align-items: center; }
+  .letter-badge { font-family: 'Baloo 2', cursive; font-weight: 700; font-size: 13.5px; color: var(--brown); }
+  .letter-condition { font-size: 11px; color: var(--loose-text); margin-top: 3px; }
+  .letter-content { margin-top: 10px; font-size: 13.5px; line-height: 1.5; white-space: pre-wrap; color: var(--brown); }
+  .letter-preview {
+    margin-top: 10px; font-size: 13px; line-height: 1.5; color: var(--loose-text);
+    white-space: pre-wrap; overflow-wrap: anywhere; word-break: break-word;
+  }
+  .letter-preview.blurred { filter: blur(4px); }
+  .letter-delete {
+    margin-top: 10px; border: 1.5px solid #E8483D; background: none; color: #E8483D; padding: 7px 12px;
+    border-radius: 12px; font-size: 11.5px; font-weight: 700; cursor: pointer;
+  }
+  .letter-empty { padding: 24px 10px; text-align: center; font-size: 12.5px; color: var(--loose-text); }
+
+  .letter-lock-icon { font-size: 15px; margin-right: 3px; }
+  .letter-card.awaiting { border: 1.5px solid var(--accent); }
+  .letter-new-banner {
+    display: flex; align-items: center; gap: 8px; padding: 12px 14px; margin-bottom: 14px; border-radius: 16px;
+    background: var(--accent); color: #fff; font-family: 'Baloo 2', cursive; font-weight: 700; font-size: 13px;
+    box-shadow: 0 6px 16px rgba(0,0,0,.12);
+  }
+
+  footer { margin-top: 30px; font-size: 13px; color: var(--loose-text); opacity: .9; text-align: center; }
+
+  .letter-modal-overlay {
+    display: none; position: fixed; inset: 0; background: rgba(43,35,32,.55); backdrop-filter: blur(2px);
+    z-index: 999; align-items: center; justify-content: center; padding: 24px;
+  }
+  .letter-modal-overlay.open { display: flex; }
+  .letter-modal {
+    position: relative; width: 100%; max-width: 420px; max-height: 78vh; overflow-y: auto;
+    background: var(--white); border-radius: 22px; padding: 30px 22px 24px;
+    box-shadow: 0 20px 50px rgba(0,0,0,.28); -webkit-overflow-scrolling: touch; text-align: left;
+  }
+  .letter-modal-close {
+    position: absolute; top: 10px; right: 10px; width: 30px; height: 30px; border: none; border-radius: 50%;
+    background: #FBF6F1; color: var(--brown); font-size: 14px; cursor: pointer; line-height: 1;
+  }
+  .letter-modal-badge { margin: 0 0 4px; font-family: 'Baloo 2', cursive; font-weight: 700; font-size: 14px; color: var(--accent); }
+  .letter-modal-condition { margin: 0 0 14px; font-size: 11.5px; color: var(--loose-text); }
+  .letter-modal-content {
+    font-size: 14.5px; line-height: 1.7; color: var(--brown);
+    white-space: pre-wrap; word-wrap: break-word; overflow-wrap: anywhere;
+  }
+</style>
+</head>
+<body class="mood-happy">
+
+<div class="page">
+  <header>
+    <p class="home-kicker">💞 twogether</p>
+    <h1 class="title">💌 Cartas seladas</h1>
+    <p class="subtitle">Palavras guardadas até a hora certa</p>
+    <nav class="site-nav">
+      <a href="index.html">🏡 Início</a>
+      <a href="places.html">🗺️ Lugares</a>
+      <a href="letters.html" class="current">💌 Cartas</a>
+      <a href="quotes.html">💬 Frases</a>
+      <a href="playground.html">🎈 Mascotinho</a>
+      <a id="logoutLink">🚪 Saída</a>
+    </nav>
+  </header>
+
+  <div class="tabs">
+    <button type="button" class="tab-btn active" data-tab="inbox">💌 Recebidas</button>
+    <button type="button" class="tab-btn" data-tab="write">✍️ Escrever</button>
+    <button type="button" class="tab-btn" data-tab="sent">📤 Enviadas</button>
+  </div>
+
+  <div class="tab-panel active" id="tab-inbox">
+    <div class="letter-list" id="inboxList"></div>
+  </div>
+
+  <div class="tab-panel" id="tab-write">
+    <div class="card-box">
+      <div class="field">
+        <label for="letterContent">✏️ Sua carta</label>
+        <textarea id="letterContent" maxlength="2000" placeholder="escreve o que quiser..."></textarea>
+      </div>
+
+      <div class="field">
+        <label>📬 Quando ela pode abrir?</label>
+        <div class="delivery-options">
+          <button type="button" class="delivery-btn active" data-delivery="immediate">Assim que quiser</button>
+          <button type="button" class="delivery-btn" data-delivery="date">Numa data</button>
+          <button type="button" class="delivery-btn" data-delivery="mood">Num humor</button>
+        </div>
+      </div>
+
+      <div class="field" id="deliveryDateField" style="display:none">
+        <label for="letterDate">📅 Data</label>
+        <input type="date" id="letterDate">
+        <label for="letterTime" class="field-sublabel">⏰ Horário</label>
+        <input type="time" id="letterTime">
+      </div>
+
+      <div class="field" id="deliveryMoodField" style="display:none">
+        <label for="letterMood">💭 Humor</label>
+        <select id="letterMood">
+          <option value="happy">😊 Feliz</option>
+          <option value="tired">🥱 Cansado(a)</option>
+          <option value="sad">😢 Triste</option>
+          <option value="mad">😠 Com raiva</option>
+          <option value="hungry">🍙 Com fome</option>
+          <option value="sleepy">😴 Com sono</option>
+          <option value="excited">🤩 Animado(a)</option>
+          <option value="naughty">😏 Travesso(a)</option>
+        </select>
+      </div>
+
+      <button type="button" class="save-btn" id="letterSaveBtn">💾 Selar carta</button>
+      <p class="form-hint" id="letterHint"></p>
+    </div>
+  </div>
+
+  <div class="tab-panel" id="tab-sent">
+    <div class="letter-list" id="sentList"></div>
+  </div>
+
+  <footer><p class="signature">👀💕</p></footer>
+</div>
+
+<div class="letter-modal-overlay" id="letterModalOverlay">
+  <div class="letter-modal">
+    <button type="button" class="letter-modal-close" id="letterModalClose">✕</button>
+    <p class="letter-modal-badge" id="letterModalBadge"></p>
+    <p class="letter-modal-condition" id="letterModalCondition"></p>
+    <div class="letter-modal-content" id="letterModalContent"></div>
+  </div>
+</div>
+
+<script type="module">
+import { createClient } from 'https://esm.sh/@supabase/supabase-js@2';
+
+const SUPABASE_URL = "https://uxuplzjsmoilzrobiflh.supabase.co";
+const SUPABASE_ANON_KEY = "sb_publishable_1mKkxDpM7WJvFm1xGVXxBA_5o1x6m9e";
+const supabase = createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+
+const moodEmoji = { happy:'😊', tired:'🥱', sad:'😢', mad:'😠', hungry:'🍙', sleepy:'😴', excited:'🤩', naughty:'😏' };
+const moodLabel = { happy:'Feliz', tired:'Cansado(a)', sad:'Triste', mad:'Com raiva', hungry:'Com fome', sleepy:'Com sono', excited:'Animado(a)', naughty:'Travesso(a)' };
+
+let myUserId = null;
+let myProfile = null;
+let partnerProfile = null;
+let selectedDelivery = 'immediate';
+
+/* ---------------- tabs ---------------- */
+document.querySelectorAll('.tab-btn').forEach(btn => {
+  btn.addEventListener('click', () => {
+    document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
+    document.querySelectorAll('.tab-panel').forEach(p => p.classList.remove('active'));
+    btn.classList.add('active');
+    document.getElementById('tab-' + btn.dataset.tab).classList.add('active');
+  });
+});
+
+/* ---------------- write form ---------------- */
+document.querySelectorAll('.delivery-btn').forEach(btn => {
+  btn.addEventListener('click', () => {
+    document.querySelectorAll('.delivery-btn').forEach(b => b.classList.remove('active'));
+    btn.classList.add('active');
+    selectedDelivery = btn.dataset.delivery;
+    document.getElementById('deliveryDateField').style.display = selectedDelivery === 'date' ? '' : 'none';
+    document.getElementById('deliveryMoodField').style.display = selectedDelivery === 'mood' ? '' : 'none';
+  });
+});
+
+document.getElementById('letterSaveBtn').addEventListener('click', async () => {
+  const content = document.getElementById('letterContent').value.trim();
+  const hint = document.getElementById('letterHint');
+  const btn = document.getElementById('letterSaveBtn');
+
+  if (!content) { hint.textContent = 'Escreve algo antes de selar 💭'; return; }
+  if (!partnerProfile) { hint.textContent = 'Seu par ainda não entrou no app 💭'; return; }
+
+  const payload = {
+    pair_id: myProfile.pair_id,
+    from_user_id: myUserId,
+    to_user_id: partnerProfile.user_id,
+    content,
+    delivery_type: selectedDelivery,
+    delivery_date: selectedDelivery === 'date' ? document.getElementById('letterDate').value || null : null,
+    delivery_time: selectedDelivery === 'date' ? document.getElementById('letterTime').value || null : null,
+    delivery_mood: selectedDelivery === 'mood' ? document.getElementById('letterMood').value : null
+  };
+
+  if (selectedDelivery === 'date' && !payload.delivery_date) { hint.textContent = 'Escolhe uma data 💭'; return; }
+  if (selectedDelivery === 'date' && !payload.delivery_time) { hint.textContent = 'Escolhe um horário 💭'; return; }
+
+  btn.disabled = true;
+  hint.textContent = 'Selando...';
+
+  const { error } = await supabase.from('letters').insert(payload);
+  btn.disabled = false;
+
+  if (error) {
+    console.error('ERRO AO SALVAR CARTA:', error);
+    hint.textContent = 'Não foi possível salvar — tente de novo 🥺';
+    return;
+  }
+
+  document.getElementById('letterContent').value = '';
+  document.getElementById('letterTime').value = '';
+  hint.textContent = 'Carta selada e enviada! 💌';
+  setTimeout(() => hint.textContent = '', 3000);
+  await loadSentLetters();
+});
+
+/* ---------------- inbox ---------------- */
+
+// combina delivery_date + delivery_time num único momento local.
+// delivery_time vem do Postgres tipo "HH:MM:SS"; cartas antigas sem horário caem à meia-noite.
+function letterDeliveryMoment(letter) {
+  if (letter.delivery_type !== 'date' || !letter.delivery_date) return null;
+  const time = (letter.delivery_time || '00:00:00').slice(0, 5);
+  return new Date(letter.delivery_date + 'T' + time + ':00');
+}
+
+function formatDateTime(moment) {
+  return moment.toLocaleDateString('pt-BR') + ' às ' + moment.toLocaleTimeString('pt-BR', { hour: '2-digit', minute: '2-digit' });
+}
+
+// texto tipo "2 dias, 5 horas, 10 minutos" até o momento informado
+function formatCountdown(moment) {
+  const diff = moment.getTime() - Date.now();
+  if (diff <= 0) return null;
+  const totalMinutes = Math.floor(diff / 60000);
+  const days = Math.floor(totalMinutes / 1440);
+  const hours = Math.floor((totalMinutes % 1440) / 60);
+  const minutes = totalMinutes % 60;
+  const parts = [];
+  if (days > 0) parts.push(days + (days === 1 ? ' dia' : ' dias'));
+  if (days > 0 || hours > 0) parts.push(hours + (hours === 1 ? ' hora' : ' horas'));
+  parts.push(minutes + (minutes === 1 ? ' minuto' : ' minutos'));
+  return parts.join(', ');
+}
+
+function dateLockedLabel(moment) {
+  const countdown = formatCountdown(moment);
+  return '🗓️ abre em ' + formatDateTime(moment) + (countdown ? ' · faltam ' + countdown : '');
+}
+
+function deliveryConditionText(letter) {
+  if (letter.delivery_type === 'immediate') return 'disponível a qualquer momento';
+  if (letter.delivery_type === 'date') {
+    const moment = letterDeliveryMoment(letter);
+    return moment ? 'abre em ' + formatDateTime(moment) : '';
+  }
+  if (letter.delivery_type === 'mood') return 'abre quando você estiver ' + (moodLabel[letter.delivery_mood] || letter.delivery_mood).toLowerCase();
+  return '';
+}
+
+function isLetterUnlocked(letter, myMood) {
+  if (letter.delivery_type === 'immediate') return true;
+  if (letter.delivery_type === 'date') {
+    const moment = letterDeliveryMoment(letter);
+    return !!moment && moment.getTime() <= Date.now();
+  }
+  if (letter.delivery_type === 'mood') return !!myMood && letter.delivery_mood === myMood;
+  return false;
+}
+
+function lockedConditionText(letter) {
+  if (letter.delivery_type === 'date') {
+    const moment = letterDeliveryMoment(letter);
+    return moment ? dateLockedLabel(moment) : '';
+  }
+  if (letter.delivery_type === 'mood') {
+    return '💭 abre quando você estiver ' + (moodLabel[letter.delivery_mood] || letter.delivery_mood).toLowerCase();
+  }
+  return '';
+}
+
+/* ---------------- modal da carta (o "quadrado" com o conteúdo inteiro) ---------------- */
+const letterModalOverlay = document.getElementById('letterModalOverlay');
+
+function openLetterModal(letter, opened) {
+  document.getElementById('letterModalBadge').textContent = opened ? '💌 carta aberta' : '💌 nova carta!';
+  document.getElementById('letterModalCondition').textContent = deliveryConditionText(letter);
+  document.getElementById('letterModalContent').textContent = letter.content;
+  letterModalOverlay.classList.add('open');
+}
+
+function closeLetterModal() { letterModalOverlay.classList.remove('open'); }
+
+document.getElementById('letterModalClose').addEventListener('click', closeLetterModal);
+letterModalOverlay.addEventListener('click', (e) => {
+  if (e.target === letterModalOverlay) closeLetterModal();
+});
+
+/* ---------------- contagem regressiva ao vivo das cartas trancadas por data ---------------- */
+let inboxCountdownTimer = null;
+
+function startInboxCountdownTimer() {
+  if (inboxCountdownTimer) clearInterval(inboxCountdownTimer);
+  inboxCountdownTimer = setInterval(() => {
+    let needsReload = false;
+    document.querySelectorAll('.letter-card.locked[data-delivery-moment]').forEach(card => {
+      const moment = new Date(card.dataset.deliveryMoment);
+      if (moment.getTime() <= Date.now()) { needsReload = true; return; }
+      const conditionEl = card.querySelector('.letter-condition');
+      if (conditionEl) conditionEl.textContent = dateLockedLabel(moment);
+    });
+    if (needsReload) loadInboxLetters();
+  }, 30000);
+}
+
+async function loadInboxLetters() {
+  const list = document.getElementById('inboxList');
+  list.innerHTML = '<div class="letter-empty">Carregando... 💌</div>';
+
+  // Agora a policy de select traz TODAS as cartas do destinatário,
+  // trancadas ou não — o front decide o que mostrar (ver migração 0004).
+  const { data, error } = await supabase.from('letters').select('*').eq('to_user_id', myUserId).order('created_at', { ascending: false });
+
+  if (error) { console.error('ERRO AO CARREGAR CARTAS:', error); list.innerHTML = '<div class="letter-empty">Não foi possível carregar 😢</div>'; return; }
+
+  const { data: myMoodRow } = await supabase.from('mood_state').select('mood').eq('user_id', myUserId).maybeSingle();
+  const myMood = myMoodRow ? myMoodRow.mood : null;
+
+  list.innerHTML = '';
+  if (!data || !data.length) {
+    list.innerHTML = '<div class="letter-empty">Nenhuma carta esperando por você agora 💭</div>';
+    return;
+  }
+
+  const readyCount = data.filter(l => !l.opened_at && isLetterUnlocked(l, myMood)).length;
+  if (readyCount > 0) {
+    const banner = document.createElement('div');
+    banner.className = 'letter-new-banner';
+    banner.textContent = readyCount === 1
+      ? '💌 Você tem uma carta esperando por você!'
+      : '💌 Você tem ' + readyCount + ' cartas esperando por você!';
+    list.appendChild(banner);
+  }
+
+  data.forEach(letter => {
+    let opened = !!letter.opened_at;
+    const unlocked = isLetterUnlocked(letter, myMood);
+
+    const card = document.createElement('div');
+
+    if (!unlocked) {
+      card.className = 'letter-card locked';
+      card.innerHTML =
+        '<div class="letter-top"><span class="letter-badge"><span class="letter-lock-icon">🔒</span>carta selada</span></div>' +
+        '<div class="letter-condition">' + lockedConditionText(letter) + '</div>';
+      const moment = letterDeliveryMoment(letter);
+      if (moment) card.dataset.deliveryMoment = moment.toISOString();
+      list.appendChild(card);
+      return;
+    }
+
+    const preview = letter.content.length > 90 ? letter.content.slice(0, 90) + '…' : letter.content;
+    card.className = 'letter-card' + (!opened ? ' awaiting' : '');
+    card.innerHTML =
+      '<div class="letter-top"><span class="letter-badge">' + (opened ? '💌 carta aberta' : '💌 nova carta!') + '</span></div>' +
+      '<div class="letter-preview' + (opened ? '' : ' blurred') + '">' + escapeHtml(preview) + '</div>' +
+      '<p class="letter-condition">' + (opened ? 'toque pra ler de novo 👆' : 'toque pra abrir 👆') + '</p>';
+
+    card.addEventListener('click', async () => {
+      openLetterModal(letter, opened);
+      if (!opened) {
+        opened = true;
+        card.classList.remove('awaiting');
+        card.querySelector('.letter-badge').textContent = '💌 carta aberta';
+        card.querySelector('.letter-preview').classList.remove('blurred');
+        card.querySelector('.letter-condition').textContent = 'toque pra ler de novo 👆';
+        await supabase.from('letters').update({ opened_at: new Date().toISOString() }).eq('id', letter.id);
+      }
+    });
+
+    list.appendChild(card);
+  });
+
+  startInboxCountdownTimer();
+}
+
+/* ---------------- sent ---------------- */
+async function loadSentLetters() {
+  const list = document.getElementById('sentList');
+  list.innerHTML = '<div class="letter-empty">Carregando... 📤</div>';
+
+  const { data, error } = await supabase.from('letters').select('*').eq('from_user_id', myUserId).order('created_at', { ascending: false });
+
+  if (error) { console.error('ERRO AO CARREGAR CARTAS ENVIADAS:', error); list.innerHTML = '<div class="letter-empty">Não foi possível carregar 😢</div>'; return; }
+
+  list.innerHTML = '';
+  if (!data || !data.length) {
+    list.innerHTML = '<div class="letter-empty">Você ainda não escreveu nenhuma carta 💭</div>';
+    return;
+  }
+
+  data.forEach(letter => {
+    const card = document.createElement('div');
+    card.className = 'letter-card locked';
+    const preview = letter.content.length > 90 ? letter.content.slice(0, 90) + '…' : letter.content;
+    card.innerHTML =
+      '<div class="letter-top"><span class="letter-badge">' + (letter.opened_at ? '✅ já foi lida' : '🔒 ainda selada') + '</span></div>' +
+      '<div class="letter-condition">' + deliveryConditionText(letter) + '</div>' +
+      '<div class="letter-preview">' + escapeHtml(preview) + '</div>' +
+      '<p class="letter-condition">toque pra ler a carta inteira 👆</p>';
+
+    card.addEventListener('click', (e) => {
+      if (e.target.closest('.letter-delete')) return;
+      openLetterModal(letter, !!letter.opened_at);
+    });
+
+    if (!letter.opened_at) {
+      const del = document.createElement('button');
+      del.className = 'letter-delete';
+      del.textContent = '🗑️ Apagar carta';
+      del.addEventListener('click', async (e) => {
+        e.stopPropagation();
+        if (!confirm('Apagar essa carta antes dela ser lida?')) return;
+        await supabase.from('letters').delete().eq('id', letter.id);
+        await loadSentLetters();
+      });
+      card.appendChild(del);
+    }
+
+    list.appendChild(card);
+  });
+}
+
+function escapeHtml(str) {
+  const div = document.createElement('div');
+  div.textContent = str;
+  return div.innerHTML;
+}
+
+document.getElementById('logoutLink').addEventListener('click', async () => {
+  await supabase.auth.signOut();
+  window.location.href = 'login.html';
+});
+
+(async function boot() {
+  const { data: sessionData } = await supabase.auth.getSession();
+  const session = sessionData && sessionData.session;
+  if (!session) { window.location.href = 'login.html'; return; }
+  myUserId = session.user.id;
+
+  const { data: profileRow } = await supabase.from('profiles').select('*').eq('user_id', myUserId).maybeSingle();
+  if (!profileRow) { window.location.href = 'index.html'; return; }
+  myProfile = profileRow;
+
+  const { data: partnerRow } = await supabase.from('profiles').select('*').eq('pair_id', myProfile.pair_id).neq('user_id', myUserId).maybeSingle();
+  partnerProfile = partnerRow;
+
+  const { data: myMoodRow } = await supabase.from('mood_state').select('mood').eq('user_id', myUserId).maybeSingle();
+  if (myMoodRow && myMoodRow.mood) document.body.className = 'mood-' + myMoodRow.mood;
+
+  await loadInboxLetters();
+  await loadSentLetters();
+})();
+</script>
+</body>
+</html>

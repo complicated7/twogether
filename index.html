@@ -96,10 +96,13 @@
     position: relative;
     z-index: 2;
     display: inline-flex;
+    flex-wrap: wrap;
+    justify-content: center;
     gap: 4px;
+    max-width: 320px;
     margin-top: 16px;
     padding: 5px;
-    border-radius: 999px;
+    border-radius: 22px;
     background: rgba(255, 255, 255, .55);
     backdrop-filter: blur(6px);
   }
@@ -447,6 +450,44 @@
     transform: translateY(-2px) scale(1.04);
   }
 
+  .letter-waiting-banner {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+    margin-top: 14px;
+    padding: 10px 10px 10px 16px;
+    border-radius: 16px;
+    background: var(--accent);
+    box-shadow: 0 6px 16px rgba(0, 0, 0, .14);
+    animation: letterBannerPop .35s cubic-bezier(.34, 1.56, .64, 1);
+  }
+  .letter-waiting-link {
+    flex: 1;
+    color: #fff;
+    font-family: 'Baloo 2', cursive;
+    font-weight: 700;
+    font-size: 13px;
+    text-align: center;
+    text-decoration: none;
+  }
+  .letter-waiting-close {
+    flex-shrink: 0;
+    width: 22px;
+    height: 22px;
+    border: none;
+    border-radius: 50%;
+    background: rgba(255, 255, 255, .25);
+    color: #fff;
+    font-size: 12px;
+    line-height: 1;
+    cursor: pointer;
+  }
+  @keyframes letterBannerPop {
+    from { transform: scale(.9); opacity: 0; }
+    to { transform: scale(1); opacity: 1; }
+  }
+
   /* =========================================================
      9. PARTNER STATUS CARD / INVITE CARD / PLAYGROUND LINK
      ========================================================= */
@@ -734,6 +775,103 @@
   .moment-delete-btn.confirm { background: #E8483D; color: #fff; }
   .moment-delete-btn:disabled { opacity: .6; pointer-events: none; }
 
+  /* memory ("on this day") pop-up */
+  .memory-overlay {
+    position: fixed;
+    inset: 0;
+    z-index: 110;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 24px;
+    background: rgba(20, 14, 12, .86);
+    opacity: 0;
+    pointer-events: none;
+    transition: opacity .25s ease;
+  }
+  .memory-overlay.show { opacity: 1; pointer-events: auto; }
+  .memory-card {
+    width: 100%;
+    max-width: 380px;
+    max-height: 88vh;
+    overflow-y: auto;
+    border-radius: 22px;
+    background: var(--white);
+    box-shadow: 0 20px 50px rgba(0, 0, 0, .4);
+    text-align: left;
+  }
+  .memory-media { width: 100%; max-height: 220px; background: #000; }
+  .memory-media img,
+  .memory-media video { width: 100%; max-height: 220px; object-fit: contain; display: block; background: #000; }
+  .memory-body { padding: 20px; }
+  .memory-kicker {
+    font-family: 'Baloo 2', cursive;
+    font-weight: 700;
+    font-size: 13px;
+    color: var(--accent);
+    margin: 0 0 6px;
+  }
+  .memory-title { font-family: 'Baloo 2', cursive; font-size: 18px; color: var(--brown); margin: 0; }
+  .memory-desc { margin-top: 8px; font-size: 13.5px; line-height: 1.5; color: var(--loose-text); white-space: pre-wrap; }
+  .memory-question {
+    margin-top: 18px;
+    padding-top: 16px;
+    border-top: 1.5px dashed #EADFD6;
+  }
+  .memory-question p { margin: 0 0 8px; font-size: 13px; font-weight: 700; color: var(--brown); }
+  .memory-question textarea {
+    width: 100%;
+    min-height: 64px;
+    padding: 10px 12px;
+    border: 1.5px solid #EADFD6;
+    border-radius: 12px;
+    background: #FBF6F1;
+    font-family: 'Quicksand', sans-serif;
+    font-size: 13.5px;
+    color: var(--brown);
+    resize: vertical;
+  }
+  .memory-question button {
+    margin-top: 8px;
+    padding: 10px 18px;
+    border: none;
+    border-radius: 14px;
+    background: var(--accent);
+    color: #fff;
+    font-family: 'Baloo 2', cursive;
+    font-weight: 700;
+    font-size: 13px;
+    cursor: pointer;
+  }
+  .memory-question button:disabled { opacity: .6; pointer-events: none; }
+  .memory-partner-reply {
+    margin-top: 12px;
+    padding: 12px 14px;
+    border-radius: 14px;
+    background: #FBF6F1;
+    font-size: 13px;
+    line-height: 1.4;
+    color: var(--brown);
+  }
+  .memory-hint { min-height: 14px; margin-top: 6px; font-size: 11.5px; color: var(--loose-text); opacity: .85; }
+  .memory-close {
+    position: absolute;
+    top: 18px;
+    right: 18px;
+    z-index: 3;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 38px;
+    height: 38px;
+    border: none;
+    border-radius: 50%;
+    background: rgba(255, 255, 255, .92);
+    color: var(--brown);
+    font-size: 17px;
+    cursor: pointer;
+  }
+
   footer { margin-top: 30px; font-size: 13px; color: var(--loose-text); opacity: .9; }
   footer .signature {
     margin-top: 4px;
@@ -782,6 +920,9 @@
 
     <nav class="site-nav">
       <a href="index.html" class="current">🏡 Início</a>
+      <a href="places.html">🗺️ Lugares</a>
+      <a href="letters.html">💌 Cartas</a>
+      <a href="quotes.html">💬 Frases</a>
       <a href="playground.html">🎈 Mascotinho</a>
       <a id="logoutLink">🚪 Saída</a>
     </nav>
@@ -804,6 +945,10 @@
       <button type="button" class="mood-btn" data-mood="sleepy"><span class="emoji">😴</span>Com sono</button>
       <button type="button" class="mood-btn" data-mood="excited"><span class="emoji">🤩</span>Animado(a)</button>
       <button type="button" class="mood-btn" data-mood="naughty"><span class="emoji">😏</span>Travesso(a)</button>
+    </div>
+    <div class="letter-waiting-banner" id="letterWaitingBanner" style="display:none">
+      <a href="letters.html" class="letter-waiting-link">💌 Você tem uma carta esperando por você — toque pra abrir!</a>
+      <button type="button" class="letter-waiting-close" id="letterWaitingClose" aria-label="Fechar aviso">✕</button>
     </div>
   </section>
 
@@ -873,6 +1018,26 @@
         <div class="moment-overlay-title" id="momentOverlayTitle"></div>
         <div class="moment-overlay-desc" id="momentOverlayDesc"></div>
         <button type="button" class="moment-delete-btn" id="momentOverlayDelete">🗑️ Excluir momento</button>
+      </div>
+    </div>
+  </div>
+
+  <div class="memory-overlay" id="memoryOverlay">
+    <div class="memory-card">
+      <button type="button" class="memory-close" id="memoryClose" aria-label="Fechar">✕</button>
+      <div class="memory-media" id="memoryMedia" style="display:none"></div>
+      <div class="memory-body">
+        <p class="memory-kicker" id="memoryKicker">💭 há um tempo...</p>
+        <p class="memory-title" id="memoryTitle"></p>
+        <p class="memory-desc" id="memoryDesc" style="display:none"></p>
+
+        <div class="memory-question">
+          <p>O que você mais lembra desse dia?</p>
+          <textarea id="memoryReplyInput" maxlength="400" placeholder="conta pra mim..."></textarea>
+          <button type="button" id="memoryReplySave">💾 Salvar resposta</button>
+          <p class="memory-hint" id="memoryHint"></p>
+          <div class="memory-partner-reply" id="memoryPartnerReply" style="display:none"></div>
+        </div>
       </div>
     </div>
   </div>
@@ -1018,9 +1183,69 @@ function applyMood(mood, opts = {}) {
       .upsert({ user_id: myUserId, mood, updated_at: new Date().toISOString() })
       .then(() => {});
   }
+
+  checkMoodLetter(mood);
 }
 
 moodButtons.forEach(btn => btn.addEventListener('click', () => applyMood(btn.dataset.mood)));
+
+/* =========================================================
+   AVISO DE CARTA ESPERANDO (destravada por humor ou por já ter
+   chegado a data+hora marcada — cartas "a qualquer momento" não
+   entram aqui, só as trancadas que acabaram de abrir)
+   ========================================================= */
+const letterWaitingBanner = document.getElementById('letterWaitingBanner');
+const letterWaitingClose = document.getElementById('letterWaitingClose');
+let currentWaitingLetterIds = [];
+
+function getDismissedLetterIds() {
+  try { return new Set(JSON.parse(sessionStorage.getItem('dismissedLetterIds') || '[]')); }
+  catch (e) { return new Set(); }
+}
+function setDismissedLetterIds(ids) {
+  try { sessionStorage.setItem('dismissedLetterIds', JSON.stringify([...ids])); } catch (e) {}
+}
+
+async function checkMoodLetter(mood) {
+  if (!myUserId || !letterWaitingBanner) return;
+
+  const { data, error } = await supabase
+    .from('letters')
+    .select('id,delivery_type,delivery_date,delivery_time,delivery_mood')
+    .eq('to_user_id', myUserId)
+    .is('opened_at', null);
+
+  if (error) { console.error('ERRO AO VERIFICAR CARTAS:', error); return; }
+
+  const now = Date.now();
+  const waitingLetters = (data || []).filter(letter => {
+    if (letter.delivery_type === 'date') {
+      if (!letter.delivery_date) return false;
+      const time = (letter.delivery_time || '00:00:00').slice(0, 5);
+      const moment = new Date(letter.delivery_date + 'T' + time + ':00');
+      return moment.getTime() <= now;
+    }
+    if (letter.delivery_type === 'mood') return letter.delivery_mood === mood;
+    return false; // cartas "a qualquer momento" não geram aviso
+  });
+
+  currentWaitingLetterIds = waitingLetters.map(l => l.id);
+  const dismissed = getDismissedLetterIds();
+  const visibleWaiting = currentWaitingLetterIds.some(id => !dismissed.has(id));
+
+  letterWaitingBanner.style.display = visibleWaiting ? 'flex' : 'none';
+}
+
+if (letterWaitingClose) {
+  letterWaitingClose.addEventListener('click', (e) => {
+    e.preventDefault();
+    e.stopPropagation();
+    const dismissed = getDismissedLetterIds();
+    currentWaitingLetterIds.forEach(id => dismissed.add(id));
+    setDismissedLetterIds(dismissed);
+    letterWaitingBanner.style.display = 'none';
+  });
+}
 
 /* =========================================================
    PARTNER CARD / INVITE CARD
@@ -1490,6 +1715,158 @@ momentForm.addEventListener('submit', async e => {
 });
 
 /* =========================================================
+   MEMORY POP-UP ("há um tempo, isso aconteceu")
+   ========================================================= */
+const MEMORY_STORAGE_KEY = 'twogetherLastMemoryShown';
+const MEMORY_MIN_AGE_DAYS = 7;
+
+const memoryOverlay = document.getElementById('memoryOverlay');
+const memoryClose = document.getElementById('memoryClose');
+const memoryMedia = document.getElementById('memoryMedia');
+const memoryKicker = document.getElementById('memoryKicker');
+const memoryTitle = document.getElementById('memoryTitle');
+const memoryDesc = document.getElementById('memoryDesc');
+const memoryReplyInput = document.getElementById('memoryReplyInput');
+const memoryReplySave = document.getElementById('memoryReplySave');
+const memoryHint = document.getElementById('memoryHint');
+const memoryPartnerReply = document.getElementById('memoryPartnerReply');
+
+let currentMemoryMoment = null;
+
+function closeMemoryOverlay() {
+  const video = memoryMedia.querySelector('video');
+  if (video) video.pause();
+  memoryOverlay.classList.remove('show');
+}
+memoryClose.addEventListener('click', closeMemoryOverlay);
+memoryOverlay.addEventListener('click', e => { if (e.target === memoryOverlay) closeMemoryOverlay(); });
+
+async function pickMemoryMoment() {
+  const cutoff = new Date(Date.now() - MEMORY_MIN_AGE_DAYS * 86400000).toISOString();
+
+  const { data, error } = await supabase
+    .from(MOMENTS_TABLE)
+    .select('*')
+    .lt('happened_at', cutoff)
+    .order('happened_at', { ascending: false });
+
+  if (error || !data || !data.length) return null;
+
+  // prefer a moment that happened on this same day/month in a past year
+  const today = new Date();
+  const sameDay = data.filter(m => {
+    const d = new Date(m.happened_at);
+    return d.getDate() === today.getDate() && d.getMonth() === today.getMonth();
+  });
+
+  const pool = sameDay.length ? sameDay : data;
+  return pool[Math.floor(Math.random() * pool.length)];
+}
+
+async function loadMemoryReplies(momentId) {
+  const { data } = await supabase.from('memory_replies').select('*').eq('moment_id', momentId);
+  return data || [];
+}
+
+async function maybeShowMemoryPopup() {
+  if (!myUserId) return;
+
+  let lastShown = null;
+  try { lastShown = localStorage.getItem(MEMORY_STORAGE_KEY); } catch (e) {}
+  const todayKey = new Date().toISOString().slice(0, 10);
+  if (lastShown === todayKey) return;
+
+  const moment = await pickMemoryMoment();
+  if (!moment) return;
+
+  currentMemoryMoment = moment;
+  const happened = new Date(moment.happened_at);
+
+  memoryKicker.textContent = '💭 ' + formatTimeAgo(happened) + ', isso aconteceu';
+  memoryTitle.textContent = moment.title;
+  memoryDesc.textContent = moment.description || '';
+  memoryDesc.style.display = moment.description ? '' : 'none';
+
+  memoryMedia.innerHTML = '';
+  memoryMedia.style.display = 'none';
+  if (moment.media_path) {
+    const { data: signed } = await momentMediaUrlFromPath(moment.media_path);
+    const mediaUrl = signed && signed.signedUrl;
+    if (mediaUrl) {
+      memoryMedia.style.display = '';
+      if (moment.media_type === 'video') {
+        const video = document.createElement('video');
+        video.src = mediaUrl;
+        video.controls = true;
+        video.playsInline = true;
+        memoryMedia.appendChild(video);
+      } else {
+        const img = document.createElement('img');
+        img.src = mediaUrl;
+        img.alt = moment.title;
+        memoryMedia.appendChild(img);
+      }
+    }
+  }
+
+  memoryReplyInput.value = '';
+  memoryHint.textContent = '';
+  memoryPartnerReply.style.display = 'none';
+  memoryPartnerReply.textContent = '';
+
+  const replies = await loadMemoryReplies(moment.id);
+  const mine = replies.find(r => r.user_id === myUserId);
+  const partnerReply = partnerProfile ? replies.find(r => r.user_id === partnerProfile.user_id) : null;
+
+  if (mine) {
+    memoryReplyInput.value = mine.reply_text;
+    memoryReplyInput.disabled = true;
+    memoryReplySave.disabled = true;
+    memoryReplySave.textContent = '💾 Resposta salva';
+  } else {
+    memoryReplyInput.disabled = false;
+    memoryReplySave.disabled = false;
+    memoryReplySave.textContent = '💾 Salvar resposta';
+  }
+
+  if (partnerReply) {
+    memoryPartnerReply.style.display = '';
+    memoryPartnerReply.textContent = '💗 ' + (partnerProfile.display_name || 'Seu amor') + ' lembrou: "' + partnerReply.reply_text + '"';
+  } else if (partnerProfile) {
+    memoryPartnerReply.style.display = '';
+    memoryPartnerReply.textContent = '💭 ' + partnerProfile.display_name + ' ainda não respondeu essa aqui.';
+  }
+
+  memoryOverlay.classList.add('show');
+  try { localStorage.setItem(MEMORY_STORAGE_KEY, todayKey); } catch (e) {}
+}
+
+memoryReplySave.addEventListener('click', async () => {
+  const text = memoryReplyInput.value.trim();
+  if (!text || !currentMemoryMoment || !myUserId) return;
+
+  memoryReplySave.disabled = true;
+  memoryHint.textContent = 'Salvando...';
+
+  const { error } = await supabase.from('memory_replies').insert({
+    moment_id: currentMemoryMoment.id,
+    user_id: myUserId,
+    reply_text: text
+  });
+
+  if (error) {
+    console.error('ERRO AO SALVAR RESPOSTA DE MEMÓRIA:', error);
+    memoryHint.textContent = 'Não foi possível salvar — tente de novo 🥺';
+    memoryReplySave.disabled = false;
+    return;
+  }
+
+  memoryReplyInput.disabled = true;
+  memoryReplySave.textContent = '💾 Resposta salva';
+  memoryHint.textContent = 'Salvo! 💕';
+});
+
+/* =========================================================
    LOGOUT
    ========================================================= */
 document.getElementById('logoutLink').addEventListener('click', async () => {
@@ -1579,6 +1956,7 @@ function playIntro(onDone) {
     applyMood(myMoodRow ? myMoodRow.mood : 'happy', { silent: true, deterministic: true, fromRemote: true });
     await refreshPartnerSection();
     await loadMoments();
+    await maybeShowMemoryPopup();
   });
 })();
 </script>

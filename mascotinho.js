@@ -6,18 +6,26 @@
  *   import { Mascotinho } from './mascotinho.js';
  *   Mascotinho.init({ supabase, pairId, container: '#mascotinho-widget' });
  *
- * Modo silencioso (só ganhar XP), usado em index.html / letters.html:
+ * Modo silencioso (só ganhar XP), usado em index.html / letters.html /
+ * quotes.html / places.html:
  *
  *   import { Mascotinho } from './mascotinho.js';
  *   Mascotinho.init({ supabase, pairId }); // sem container
- *   await Mascotinho.ganharXP('momento');  // ou 'carta' / 'login'
+ *   await Mascotinho.ganharXP('momento');  // ou 'carta' / 'frase' / 'lugar' / 'memoria' / 'humor' / 'login'
  */
 
 const XP_POR_ACAO = {
   momento: 15,
   carta: 15,
+  frase: 10,
+  lugar: 10,
+  memoria: 12,
+  humor: 6,
   login: 8,
 };
+
+// Ações que só rendem XP uma vez por dia (pra não virar spam de clique).
+const TIPOS_DIARIOS = new Set(['login', 'humor']);
 
 // Catálogo de roupinhas — desbloqueadas automaticamente pelo nível.
 const ROUPAS = [
@@ -243,17 +251,17 @@ export const Mascotinho = (() => {
     }, 3200);
   }
 
-  function jaGanhouLoginHoje() {
-    const chave = `mascotinho_login_${pairId}`;
+  function jaGanhouHoje(tipo) {
+    const chave = `mascotinho_${tipo}_${pairId}`;
     return localStorage.getItem(chave) === new Date().toDateString();
   }
-  function marcarLoginHoje() {
-    localStorage.setItem(`mascotinho_login_${pairId}`, new Date().toDateString());
+  function marcarGanhoHoje(tipo) {
+    localStorage.setItem(`mascotinho_${tipo}_${pairId}`, new Date().toDateString());
   }
 
   async function ganharXP(tipo) {
     if (!supabase || !pairId) return;
-    if (tipo === 'login' && jaGanhouLoginHoje()) return;
+    if (TIPOS_DIARIOS.has(tipo) && jaGanhouHoje(tipo)) return;
 
     const quantidade = XP_POR_ACAO[tipo];
     if (!quantidade) {
@@ -283,7 +291,7 @@ export const Mascotinho = (() => {
       );
     }
 
-    if (tipo === 'login') marcarLoginHoje();
+    if (TIPOS_DIARIOS.has(tipo)) marcarGanhoHoje(tipo);
   }
 
   async function carinho() {

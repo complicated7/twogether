@@ -190,6 +190,7 @@
 
 <script type="module">
 import { createClient } from 'https://esm.sh/@supabase/supabase-js@2';
+import { Mascotinho } from './mascotinho.js';
 
 const SUPABASE_URL = "https://uxuplzjsmoilzrobiflh.supabase.co";
 const SUPABASE_ANON_KEY = "sb_publishable_1mKkxDpM7WJvFm1xGVXxBA_5o1x6m9e";
@@ -284,6 +285,7 @@ document.getElementById('quoteSaveBtn').addEventListener('click', async () => {
     document.getElementById('quoteText').value = '';
     hint.textContent = 'Frase guardada! 💕';
     setTimeout(() => hint.textContent = '', 3000);
+    Mascotinho.ganharXP('frase');
     await loadQuotes();
     return;
   }
@@ -324,6 +326,7 @@ document.getElementById('quoteSaveBtn').addEventListener('click', async () => {
     quoteImagePreview.style.display = 'none';
     hint.textContent = 'Print guardado! 💕';
     setTimeout(() => hint.textContent = '', 3000);
+    Mascotinho.ganharXP('frase');
     await loadQuotes();
     return;
   }
@@ -363,6 +366,7 @@ document.getElementById('quoteSaveBtn').addEventListener('click', async () => {
   quoteAudioPreview.style.display = 'none';
   hint.textContent = 'Áudio guardado! 💕';
   setTimeout(() => hint.textContent = '', 3000);
+  Mascotinho.ganharXP('frase');
   await loadQuotes();
 });
 
@@ -472,6 +476,8 @@ document.getElementById('logoutLink').addEventListener('click', async () => {
   const { data: profileRow } = await supabase.from('profiles').select('*').eq('user_id', myUserId).maybeSingle();
   if (!profileRow) { window.location.href = 'index.html'; return; }
   myProfile = profileRow;
+
+  Mascotinho.init({ supabase, pairId: myProfile.pair_id });
 
   const { data: partnerRow } = await supabase.from('profiles').select('*').eq('pair_id', myProfile.pair_id).neq('user_id', myUserId).maybeSingle();
   partnerProfile = partnerRow;

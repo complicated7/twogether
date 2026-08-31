@@ -27,6 +27,9 @@ const ROUPAS = [
   { id: 'jaqueta', nivel: 6, nome: 'Jaquetinha', emoji: '🧥' },
   { id: 'coroa', nivel: 9, nome: 'Coroa', emoji: '👑' },
   { id: 'terno', nivel: 12, nome: 'Terno de gala', emoji: '🎩' },
+  { id: 'dino', nivel: 15, nome: 'Fantasia de dinossauro', emoji: '🦖' },
+  { id: 'vestido', nivel: 18, nome: 'Vestido de festa', emoji: '👗' },
+  { id: 'heroi', nivel: 21, nome: 'Capa de super-herói', emoji: '🦸' },
 ];
 
 const ACESSORIOS = [
@@ -35,6 +38,9 @@ const ACESSORIOS = [
   { id: 'mochila', nivel: 5, nome: 'Mochila', emoji: '🎒' },
   { id: 'flor', nivel: 7, nome: 'Florzinha', emoji: '🌸' },
   { id: 'estrela', nivel: 10, nome: 'Varinha de estrela', emoji: '✨' },
+  { id: 'laco', nivel: 13, nome: 'Laço', emoji: '🎀' },
+  { id: 'relogio', nivel: 16, nome: 'Relógio', emoji: '⌚' },
+  { id: 'coroaflores', nivel: 19, nome: 'Coroa de flores', emoji: '💐' },
 ];
 
 const QUARTOS = [
@@ -43,6 +49,22 @@ const QUARTOS = [
   { id: 'noturno', nivel: 6, nome: 'Céu estrelado' },
   { id: 'praia', nivel: 8, nome: 'Praiazinha' },
   { id: 'realeza', nivel: 11, nome: 'Salão real' },
+  { id: 'floresta', nivel: 14, nome: 'Floresta encantada' },
+  { id: 'espaco', nivel: 17, nome: 'Espaço sideral' },
+  { id: 'castelo', nivel: 20, nome: 'Castelo de nuvens' },
+];
+
+// Catálogo de comidinhas — alimentar recupera fome (e um pouquinho de
+// felicidade/energia + XP). Também desbloqueadas automaticamente pelo nível.
+const COMIDAS = [
+  { id: 'morango', nivel: 1, nome: 'Morango', emoji: '🍓' },
+  { id: 'bolinho', nivel: 3, nome: 'Bolinho', emoji: '🧁' },
+  { id: 'macarrao', nivel: 5, nome: 'Macarrão', emoji: '🍜' },
+  { id: 'sorvete', nivel: 7, nome: 'Sorvete', emoji: '🍨' },
+  { id: 'pizza', nivel: 9, nome: 'Pizza', emoji: '🍕' },
+  { id: 'bolo', nivel: 11, nome: 'Bolo', emoji: '🎂' },
+  { id: 'sushi', nivel: 14, nome: 'Sushi', emoji: '🍣' },
+  { id: 'chocolate', nivel: 17, nome: 'Chocolate', emoji: '🍫' },
 ];
 
 function itensDesbloqueados(catalogo, nivel) {
@@ -50,7 +72,7 @@ function itensDesbloqueados(catalogo, nivel) {
 }
 
 function proximoNivelDesbloqueio(nivelAtual) {
-  const todos = [...ROUPAS, ...ACESSORIOS, ...QUARTOS].map((i) => i.nivel);
+  const todos = [...ROUPAS, ...ACESSORIOS, ...QUARTOS, ...COMIDAS].map((i) => i.nivel);
   const proximos = todos.filter((n) => n > nivelAtual);
   return proximos.length ? Math.min(...proximos) : null;
 }
@@ -80,6 +102,7 @@ export const Mascotinho = (() => {
     const roupasDisponiveis = itensDesbloqueados(ROUPAS, m.nivel);
     const acessoriosDisponiveis = itensDesbloqueados(ACESSORIOS, m.nivel);
     const quartosDisponiveis = itensDesbloqueados(QUARTOS, m.nivel);
+    const comidasDisponiveis = itensDesbloqueados(COMIDAS, m.nivel);
     const proximo = proximoNivelDesbloqueio(m.nivel);
 
     container.innerHTML = `
@@ -100,7 +123,19 @@ export const Mascotinho = (() => {
           ${barraHtml(m.energia, '#7FB07A', '⚡', 'energia')}
         </div>
 
-        <button class="masc-btn-carinho" id="masc-btn-carinho">💗 Fazer carinho</button>
+        <div class="masc-acoes">
+          <button class="masc-btn-carinho" id="masc-btn-carinho">💗 Fazer carinho</button>
+        </div>
+
+        <details class="masc-guarda-roupa masc-cardapio">
+          <summary>Comidinhas</summary>
+          <div class="masc-secao">
+            <p class="masc-secao-titulo">Toque para alimentar</p>
+            <div class="masc-opcoes">
+              ${comidasDisponiveis.map((c) => `<button class="masc-opcao masc-comida ${c.id === m.ultima_comida ? 'ativa' : ''}" data-id="${c.id}" data-nivel="${c.nivel}">${c.emoji} ${c.nome}</button>`).join('')}
+            </div>
+          </div>
+        </details>
 
         <details class="masc-guarda-roupa">
           <summary>Roupinhas, acessórios e quarto</summary>
@@ -124,7 +159,10 @@ export const Mascotinho = (() => {
     `;
 
     container.querySelector('#masc-btn-carinho').addEventListener('click', carinho);
-    container.querySelectorAll('.masc-opcao').forEach((btn) => {
+    container.querySelectorAll('.masc-comida').forEach((btn) => {
+      btn.addEventListener('click', () => alimentar(btn.dataset.id, Number(btn.dataset.nivel)));
+    });
+    container.querySelectorAll('.masc-opcao:not(.masc-comida)').forEach((btn) => {
       btn.addEventListener('click', () => equipar(btn.dataset.tipo, btn.dataset.id, Number(btn.dataset.nivel)));
     });
 
@@ -266,6 +304,30 @@ export const Mascotinho = (() => {
         btn.textContent = 'Ele já recebeu carinho recentemente 💤';
         setTimeout(() => { btn.textContent = original; }, 2200);
       }
+    }
+  }
+
+  async function alimentar(id, nivelMinimo) {
+    if (!supabase || !pairId || !estadoAtual) return;
+    if (estadoAtual.nivel < nivelMinimo) return;
+
+    const { data, error } = await supabase.rpc('alimentar_mascote', {
+      p_pair_id: pairId,
+      p_comida_id: id,
+    });
+    if (error) {
+      console.error('Erro ao alimentar o mascotinho:', error);
+      return;
+    }
+    const linha = Array.isArray(data) ? data[0] : data;
+    estadoAtual = linha.mascote;
+    render();
+
+    if (linha.podia_alimentar) {
+      const comida = COMIDAS.find((c) => c.id === id);
+      mostrarToast(`${comida ? comida.emoji : '🍽️'} Ela adorou a comidinha!`);
+    } else {
+      mostrarToast('Ela ainda está satisfeita, tenta de novo daqui a pouco 🍽️');
     }
   }
 

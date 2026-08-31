@@ -155,6 +155,7 @@
     width:100%; max-width:340px; background:rgba(255,255,255,0.82); backdrop-filter:blur(10px);
     border-radius:26px 20px 28px 18px; padding:14px 18px 12px; box-shadow:0 -6px 24px rgba(43,35,32,0.14);
     color:var(--ink);
+    max-height:52vh; overflow-y:auto; -webkit-overflow-scrolling:touch;
   }
   .masc-header{ display:flex; align-items:baseline; justify-content:space-between; margin-bottom:8px; }
   .masc-title{ font-family:'Baloo 2',cursive; font-weight:700; font-size:15px; }
@@ -222,7 +223,7 @@
     .names{ font-size:clamp(17px,5.5vw,21px); }
     .hint{ font-size:11px; margin-top:3px; }
     #mascotinho-widget{ padding:0 10px 10px; }
-    .masc-card{ max-width:100%; border-radius:18px 14px 20px 12px; padding:10px 14px 9px; }
+    .masc-card{ max-width:100%; border-radius:18px 14px 20px 12px; padding:10px 14px 9px; max-height:46vh; }
     .masc-title{ font-size:13px; }
     .masc-nivel{ font-size:10.5px; padding:2px 8px; }
     .masc-xp-row{ margin-bottom:8px; }
@@ -445,10 +446,24 @@
       faceEl.style.top = top + 'px';
     }
 
+    function maxTopAllowed(h){
+      // nunca deixa o bichinho descer atrás do card do mascotinho
+      var widget = document.getElementById('mascotinho-widget');
+      var limit = window.innerHeight - h - 10;
+      if (widget) {
+        var wRect = widget.getBoundingClientRect();
+        if (wRect.height > 0) {
+          limit = Math.min(limit, wRect.top - h - 12);
+        }
+      }
+      return Math.max(limit, 10);
+    }
+
     function restPosition(){
       var rect = faceEl.getBoundingClientRect();
-      var w = rect.width || 170;
-      return { left: (window.innerWidth - w) / 2, top: window.innerHeight * 0.4 };
+      var w = rect.width || 170, h = rect.height || 170;
+      var top = Math.min(window.innerHeight * 0.4, maxTopAllowed(h));
+      return { left: (window.innerWidth - w) / 2, top: top };
     }
 
     function initialPlacement(){
@@ -464,7 +479,7 @@
       var rect = faceEl.getBoundingClientRect();
       var w = rect.width || 170, h = rect.height || 170, margin = 10;
       var left = Math.min(Math.max(x - w / 2, margin), window.innerWidth - w - margin);
-      var top = Math.min(Math.max(y - h / 2, margin), window.innerHeight - h - margin);
+      var top = Math.min(Math.max(y - h / 2, margin), maxTopAllowed(h));
       placeFace(left, top, fast ? 0.3 : 0.65);
     }
 
@@ -476,7 +491,7 @@
       var rect = faceEl.getBoundingClientRect();
       var w = rect.width, h = rect.height, margin = 10;
       var awayLeft = side === 'left' ? (window.innerWidth - w - margin) : margin;
-      var awayTop = Math.random() < 0.5 ? margin : (window.innerHeight - h - margin);
+      var awayTop = Math.random() < 0.5 ? margin : maxTopAllowed(h);
       placeFace(awayLeft, awayTop, 0.45);
       reactionTimer = setTimeout(showMoodFace, 900);
     }

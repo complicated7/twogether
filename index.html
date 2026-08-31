@@ -1054,6 +1054,7 @@
    CONFIG / SUPABASE CLIENT
    ========================================================= */
 import { createClient } from 'https://esm.sh/@supabase/supabase-js@2';
+import { Mascotinho } from './mascotinho.js';
 
 const SUPABASE_URL = "https://uxuplzjsmoilzrobiflh.supabase.co";
 const SUPABASE_ANON_KEY = "sb_publishable_1mKkxDpM7WJvFm1xGVXxBA_5o1x6m9e";
@@ -1712,6 +1713,7 @@ momentForm.addEventListener('submit', async e => {
   momentForm.reset();
   setTimeout(() => momentHint.textContent = '', 3000);
   await loadMoments();
+  Mascotinho.ganharXP('momento');
 });
 
 /* =========================================================
@@ -1934,6 +1936,9 @@ function playIntro(onDone) {
     profileRow = profileRow2;
   }
   myProfile = profileRow;
+
+  Mascotinho.init({ supabase, pairId: myProfile.pair_id });
+  Mascotinho.ganharXP('login');
 
   const { data: pairRow, error: pairError } = await supabase.from('pairs').select('id,since_date,invite_code').eq('id', myProfile.pair_id).maybeSingle();
   if (pairError) console.error('Erro ao carregar o casal:', pairError);

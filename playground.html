@@ -31,12 +31,18 @@
   html, body{ margin:0; padding:0; min-height:100%; }
 
   body{
-    background: linear-gradient(180deg, var(--bg-top) 0%, var(--bg-bottom) 100%);
+    background: var(--quarto-pattern, none), linear-gradient(180deg, var(--bg-top) 0%, var(--bg-bottom) 100%);
     transition: background 0.7s ease;
     font-family: 'Quicksand', sans-serif;
     color: var(--brown);
     min-height:100vh; position:relative; overflow:hidden;
   }
+  /* Padrões de fundo do "quarto" do mascotinho — sutis, ficam por
+     baixo do gradiente de humor, que continua mandando na cor. */
+  body[data-quarto="jardim"]{ --quarto-pattern: radial-gradient(circle, rgba(127,176,122,0.16) 2px, transparent 2.5px); background-size: 34px 34px, auto; }
+  body[data-quarto="noturno"]{ --quarto-pattern: radial-gradient(circle, rgba(255,255,255,0.35) 1.2px, transparent 1.6px); background-size: 46px 46px, auto; }
+  body[data-quarto="praia"]{ --quarto-pattern: repeating-linear-gradient(180deg, rgba(143,211,255,0.12) 0px, rgba(143,211,255,0.12) 3px, transparent 3px, transparent 22px); background-size: auto, auto; }
+  body[data-quarto="realeza"]{ --quarto-pattern: radial-gradient(circle, rgba(196,99,217,0.14) 1.6px, transparent 2px); background-size: 30px 30px, auto; }
   body::before{
     content:""; position:fixed; inset:0; z-index:0; pointer-events:none;
     background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='120' height='120'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='2' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)' opacity='0.35'/%3E%3C/svg%3E");
@@ -131,6 +137,68 @@
     transition:opacity .25s ease, transform .25s ease; pointer-events:none; z-index:5;
   }
   .no-bubble.show{ opacity:1; transform:translate(-50%,0); }
+
+  /* ---------------- Roupinha/acessório desenhados sobre o rosto ---------------- */
+  .masc-face-overlay{ position:absolute; inset:0; pointer-events:none; }
+  .masc-face-item{ position:absolute; font-size:1.8rem; filter: drop-shadow(0 3px 4px rgba(0,0,0,0.18)); }
+  .masc-face-roupa{ bottom:6%; left:8%; }
+  .masc-face-acessorio{ top:2%; right:6%; }
+
+  /* ---------------- Painel do mascotinho (nível, XP, status) ---------------- */
+  #mascotinho-widget{ position:fixed; left:0; right:0; bottom:0; z-index:4; display:flex; justify-content:center; padding:0 14px 14px; pointer-events:none; }
+  #mascotinho-widget > *{ pointer-events:auto; }
+
+  .masc-card{
+    width:100%; max-width:340px; background:rgba(255,255,255,0.82); backdrop-filter:blur(10px);
+    border-radius:26px 20px 28px 18px; padding:14px 18px 12px; box-shadow:0 -6px 24px rgba(43,35,32,0.14);
+    color:var(--ink);
+  }
+  .masc-header{ display:flex; align-items:baseline; justify-content:space-between; margin-bottom:8px; }
+  .masc-title{ font-family:'Baloo 2',cursive; font-weight:700; font-size:15px; }
+  .masc-nivel{ font-family:'Baloo 2',cursive; font-weight:600; font-size:12px; background:rgba(43,35,32,0.08); padding:2px 10px; border-radius:999px; }
+
+  .masc-xp-row{ display:flex; align-items:center; gap:8px; margin-bottom:10px; }
+  .masc-xp-track{ flex:1; height:8px; border-radius:999px; background:rgba(43,35,32,0.1); overflow:hidden; }
+  .masc-xp-fill{ height:100%; background:linear-gradient(90deg,#FFD37A,#FFA83D); border-radius:999px; transition:width .5s ease; }
+  .masc-xp-label{ font-size:10.5px; font-weight:700; opacity:.7; white-space:nowrap; }
+
+  .masc-stats{ display:flex; flex-direction:column; gap:6px; margin-bottom:10px; }
+  .masc-stat{ display:grid; grid-template-columns:18px 1fr 26px auto; align-items:center; gap:6px; }
+  .masc-stat-emoji{ font-size:13px; text-align:center; }
+  .masc-stat-track{ height:6px; border-radius:999px; background:rgba(43,35,32,0.1); overflow:hidden; }
+  .masc-stat-fill{ height:100%; border-radius:999px; transition:width .5s ease; }
+  .masc-stat-value{ font-size:11px; font-weight:700; text-align:right; }
+  .masc-stat-label{ font-size:11px; opacity:.65; }
+
+  .masc-btn-carinho{
+    width:100%; font-family:'Baloo 2',cursive; font-weight:600; font-size:13px; color:var(--ink);
+    background:#fff; border:none; padding:8px 14px; border-radius:999px; cursor:pointer;
+    box-shadow:0 4px 10px rgba(43,35,32,0.16); transition:transform .15s ease;
+  }
+  .masc-btn-carinho:hover{ transform:translateY(-2px); }
+  .masc-btn-carinho:active{ transform:translateY(0); }
+
+  .masc-guarda-roupa{ margin-top:10px; border-top:1px solid rgba(43,35,32,0.12); padding-top:8px; }
+  .masc-guarda-roupa summary{ cursor:pointer; font-family:'Baloo 2',cursive; font-weight:600; font-size:12.5px; list-style:none; }
+  .masc-guarda-roupa summary::-webkit-details-marker{ display:none; }
+  .masc-guarda-roupa summary::before{ content:'🧸 '; }
+  .masc-secao-titulo{ font-weight:700; font-size:11px; margin:8px 0 5px; opacity:.75; }
+  .masc-opcoes{ display:flex; flex-wrap:wrap; gap:5px; }
+  .masc-opcao{ font-family:'Quicksand',sans-serif; font-size:11px; padding:5px 10px; border-radius:12px; border:1.4px solid rgba(43,35,32,0.16); background:rgba(255,255,255,0.5); cursor:pointer; }
+  .masc-opcao.ativa{ border-color:var(--ink); background:#fff; font-weight:700; }
+  .masc-proximo{ margin-top:8px; font-size:10.5px; opacity:.6; }
+
+  .masc-toast{
+    position:fixed; left:50%; bottom:180px; transform:translate(-50%,20px); z-index:9999;
+    background:var(--ink); color:#FFF6EC; padding:11px 20px; border-radius:999px;
+    font-family:'Baloo 2',cursive; font-weight:600; font-size:13px; opacity:0;
+    transition:opacity .4s ease, transform .4s ease;
+  }
+  .masc-toast-visivel{ opacity:1; transform:translate(-50%,0); }
+
+  @media (max-width:480px){
+    .masc-card{ max-width:100%; border-radius:20px 16px 22px 14px; }
+  }
 </style>
 </head>
 <body class="mood-happy">
@@ -279,11 +347,14 @@
   </svg>
 </div>
 
+<div id="mascotinho-widget"></div>
+
 <script type="module">
   import { createClient } from 'https://esm.sh/@supabase/supabase-js@2';
+  import { Mascotinho } from './mascotinho.js';
 
   var SUPABASE_URL = "https://uxuplzjsmoilzrobiflh.supabase.co";
-  var SUPABASE_ANON_KEY = "https://uxuplzjsmoilzrobiflh.supabase.co";
+  var SUPABASE_ANON_KEY = "sb_publishable_1mKkxDpM7WJvFm1xGVXxBA_5o1x6m9e";
   var supabase = createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
 
   document.getElementById('logoutLink').addEventListener('click', async function(){
@@ -463,7 +534,7 @@
 
     // tap anywhere else on the page: the face just goes there, no irritation
     document.addEventListener('click', function(e){
-      if (e.target.closest('.face-wanderer, a')) return;
+      if (e.target.closest('.face-wanderer, a, #mascotinho-widget')) return;
       moveFaceTo(e.clientX, e.clientY, false);
       playAnim('bounce', 550);
     });
@@ -514,6 +585,8 @@
       showMoodFace();
       return;
     }
+
+    Mascotinho.init({ supabase: supabase, pairId: myProfile.pair_id, container: '#mascotinho-widget' });
 
     var { data: partnerProfile } = await supabase.from('profiles').select('*').eq('pair_id', myProfile.pair_id).neq('user_id', myUserId).maybeSingle();
     if (!partnerProfile){

@@ -225,6 +225,7 @@
 
 <script type="module">
 import { createClient } from 'https://esm.sh/@supabase/supabase-js@2';
+import { Mascotinho } from './mascotinho.js';
 
 const SUPABASE_URL = "https://uxuplzjsmoilzrobiflh.supabase.co";
 const SUPABASE_ANON_KEY = "sb_publishable_1mKkxDpM7WJvFm1xGVXxBA_5o1x6m9e";
@@ -298,6 +299,7 @@ document.getElementById('letterSaveBtn').addEventListener('click', async () => {
   hint.textContent = 'Carta selada e enviada! 💌';
   setTimeout(() => hint.textContent = '', 3000);
   await loadSentLetters();
+  Mascotinho.ganharXP('carta');
 });
 
 /* ---------------- inbox ---------------- */
@@ -537,6 +539,8 @@ document.getElementById('logoutLink').addEventListener('click', async () => {
   const { data: profileRow } = await supabase.from('profiles').select('*').eq('user_id', myUserId).maybeSingle();
   if (!profileRow) { window.location.href = 'index.html'; return; }
   myProfile = profileRow;
+
+  Mascotinho.init({ supabase, pairId: myProfile.pair_id });
 
   const { data: partnerRow } = await supabase.from('profiles').select('*').eq('pair_id', myProfile.pair_id).neq('user_id', myUserId).maybeSingle();
   partnerProfile = partnerRow;

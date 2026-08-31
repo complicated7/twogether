@@ -116,7 +116,7 @@ export const Mascotinho = (() => {
     container.innerHTML = `
       <div class="masc-card">
         <div class="masc-header">
-          <span class="masc-title">Disgramadinha dengosa</span>
+          <span class="masc-title">Disgramadinha Dengosa</span>
           <span class="masc-nivel">Nível ${m.nivel}</span>
         </div>
 

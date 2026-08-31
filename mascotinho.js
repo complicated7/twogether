@@ -27,6 +27,16 @@ const XP_POR_ACAO = {
 // Ações que só rendem XP uma vez por dia (pra não virar spam de clique).
 const TIPOS_DIARIOS = new Set(['login', 'humor']);
 
+// Falas aleatórias do sussurro — puramente decorativo, sem stat/XP.
+const FALAS_SUSSURRO = [
+  'Hihi, isso fica só entre a gente 🤫',
+  'Aaaw, guardei isso no coraçãozinho 💗',
+  '*acena o rabinho, feliz*',
+  'Conta mais! Adoro fofoca boa 👀',
+  'Isso me deixou com mais energia! ⚡',
+  'Vou sonhar com isso hoje à noite 🌙',
+];
+
 // Catálogo de roupinhas — desbloqueadas automaticamente pelo nível.
 const ROUPAS = [
   { id: 'nenhuma', nivel: 1, nome: 'Sem roupinha', emoji: '' },
@@ -90,6 +100,7 @@ export const Mascotinho = (() => {
   let pairId = null;
   let container = null;
   let estadoAtual = null;
+  let presentesPendentes = [];
 
   function barraHtml(valor, cor, emoji, label) {
     const pct = Math.max(0, Math.min(100, Math.round(valor)));
@@ -116,7 +127,7 @@ export const Mascotinho = (() => {
     container.innerHTML = `
       <div class="masc-card">
         <div class="masc-header">
-          <span class="masc-title">Disgramadinha Dengosa</span>
+          <span class="masc-title">Nosso mascotinho</span>
           <span class="masc-nivel">Nível ${m.nivel}</span>
         </div>
 
@@ -129,11 +140,32 @@ export const Mascotinho = (() => {
           ${barraHtml(m.felicidade, '#E38FA0', '❤️', 'felicidade')}
           ${barraHtml(m.fome, '#E3A85C', '🍎', 'fome')}
           ${barraHtml(m.energia, '#7FB07A', '⚡', 'energia')}
+          ${barraHtml(m.higiene, '#7FC4E0', '🛁', 'higiene')}
         </div>
 
+        ${m.streak_dias > 0 ? `<p class="masc-streak">🔥 ${m.streak_dias} dia${m.streak_dias > 1 ? 's' : ''} seguido${m.streak_dias > 1 ? 's' : ''} cuidando dele</p>` : ''}
+
+        ${presentesPendentes.length ? `
+          <div class="masc-presentes-aviso">
+            ${presentesPendentes.map((p) => `<button class="masc-presente-btn" data-id="${p.id}">🎁 Tem um presente esperando! Toque pra abrir</button>`).join('')}
+          </div>
+        ` : ''}
+
         <div class="masc-acoes">
-          <button class="masc-btn-carinho" id="masc-btn-carinho">💗 Fazer carinho</button>
+          <button class="masc-btn-carinho" id="masc-btn-carinho">💗 Carinho</button>
+          <button class="masc-btn-carinho" id="masc-btn-brincar">🧸 Brincar</button>
+          <button class="masc-btn-carinho" id="masc-btn-soneca">😴 Soneca</button>
+          <button class="masc-btn-carinho" id="masc-btn-banho">🛁 Banho</button>
         </div>
+
+        <details class="masc-guarda-roupa masc-sussurro">
+          <summary>Cochichar um segredo</summary>
+          <div class="masc-secao">
+            <textarea id="masc-sussurro-texto" class="masc-sussurro-input" maxlength="300" placeholder="Sussurra algo pra ele..."></textarea>
+            <button class="masc-btn-carinho" id="masc-btn-sussurrar">🤫 Sussurrar</button>
+            <p class="masc-sussurro-resposta" id="masc-sussurro-resposta"></p>
+          </div>
+        </details>
 
         <details class="masc-guarda-roupa masc-cardapio">
           <summary>Comidinhas</summary>
@@ -167,6 +199,13 @@ export const Mascotinho = (() => {
     `;
 
     container.querySelector('#masc-btn-carinho').addEventListener('click', carinho);
+    container.querySelector('#masc-btn-brincar').addEventListener('click', brincar);
+    container.querySelector('#masc-btn-soneca').addEventListener('click', colocarParaDormir);
+    container.querySelector('#masc-btn-banho').addEventListener('click', darBanho);
+    container.querySelector('#masc-btn-sussurrar').addEventListener('click', sussurrar);
+    container.querySelectorAll('.masc-presente-btn').forEach((btn) => {
+      btn.addEventListener('click', () => resgatarPresente(Number(btn.dataset.id)));
+    });
     container.querySelectorAll('.masc-comida').forEach((btn) => {
       btn.addEventListener('click', () => alimentar(btn.dataset.id, Number(btn.dataset.nivel)));
     });
@@ -289,6 +328,10 @@ export const Mascotinho = (() => {
           ? `🎉 O mascotinho subiu ${linha.niveis_ganhos} níveis! Novo item desbloqueado.`
           : '🎉 O mascotinho subiu de nível! Novo item desbloqueado.'
       );
+    } else if (linha.streak_bonus_semanal) {
+      mostrarToast(`🔥 ${linha.streak_dias} dias seguidos! +20 XP de bônus`);
+    } else if (linha.ganhou_bonus_dupla) {
+      mostrarToast('💞 Vocês dois cuidaram dele hoje! +15 XP de bônus de dupla');
     }
 
     if (TIPOS_DIARIOS.has(tipo)) marcarGanhoHoje(tipo);
@@ -339,6 +382,122 @@ export const Mascotinho = (() => {
     }
   }
 
+  async function brincar() {
+    if (!supabase || !pairId) return;
+    const { data, error } = await supabase.rpc('brincar_mascote', { p_pair_id: pairId });
+    if (error) {
+      console.error('Erro ao brincar com o mascotinho:', error);
+      return;
+    }
+    const linha = Array.isArray(data) ? data[0] : data;
+    estadoAtual = linha.mascote;
+    render();
+
+    if (!linha.podia_brincar) {
+      mostrarToast(
+        estadoAtual.energia < 10
+          ? 'Ele está sem energia pra brincar agora, deixa ele descansar 😴'
+          : 'Ele ainda está cansado da última brincadeira, tenta mais tarde 🧸'
+      );
+    } else {
+      mostrarToast('🧸 Que brincadeira divertida! Ela ficou super feliz');
+    }
+  }
+
+  async function colocarParaDormir() {
+    if (!supabase || !pairId) return;
+    const { data, error } = await supabase.rpc('colocar_para_dormir_mascote', { p_pair_id: pairId });
+    if (error) {
+      console.error('Erro ao colocar o mascotinho pra dormir:', error);
+      return;
+    }
+    estadoAtual = data;
+    render();
+    mostrarToast('😴 Ela foi tirar uma soneca — a energia volta mais rápido agora');
+  }
+
+  async function darBanho() {
+    if (!supabase || !pairId) return;
+    const { data, error } = await supabase.rpc('dar_banho_mascote', { p_pair_id: pairId });
+    if (error) {
+      console.error('Erro ao dar banho no mascotinho:', error);
+      return;
+    }
+    const linha = Array.isArray(data) ? data[0] : data;
+    estadoAtual = linha.mascote;
+    render();
+
+    if (linha.podia_dar_banho) {
+      mostrarToast('🛁 Banho tomado! Ela ficou cheirosinha');
+    } else {
+      mostrarToast('Ela já tomou banho recentemente, ainda está limpinha 🛁');
+    }
+  }
+
+  async function sussurrar() {
+    if (!supabase || !pairId || !container) return;
+    const campo = container.querySelector('#masc-sussurro-texto');
+    const respostaEl = container.querySelector('#masc-sussurro-resposta');
+    const texto = campo ? campo.value.trim() : '';
+    if (!texto) return;
+
+    const { error } = await supabase.rpc('sussurrar_mascote', { p_pair_id: pairId, p_texto: texto });
+    if (error) {
+      console.error('Erro ao sussurrar pro mascotinho:', error);
+      return;
+    }
+
+    const fala = FALAS_SUSSURRO[Math.floor(Math.random() * FALAS_SUSSURRO.length)];
+    if (campo) campo.value = '';
+    if (respostaEl) respostaEl.textContent = fala;
+  }
+
+  async function carregarPresentesPendentes() {
+    const { data, error } = await supabase.rpc('listar_presentes_pendentes_mascote', { p_pair_id: pairId });
+    if (error) {
+      console.error('Erro ao carregar presentes do mascotinho:', error);
+      return;
+    }
+    presentesPendentes = data || [];
+    render();
+  }
+
+  async function deixarPresente(tipo, comidaId, mensagem) {
+    if (!supabase || !pairId) return;
+    const { error } = await supabase.rpc('deixar_presente_mascote', {
+      p_pair_id: pairId,
+      p_tipo: tipo,
+      p_comida_id: comidaId || null,
+      p_mensagem: mensagem || null,
+    });
+    if (error) {
+      console.error('Erro ao deixar presente do mascotinho:', error);
+      return;
+    }
+    mostrarToast('🎁 Presente deixado! Seu par vai encontrar quando entrar');
+  }
+
+  async function resgatarPresente(presenteId) {
+    if (!supabase || !pairId) return;
+    const { data, error } = await supabase.rpc('resgatar_presente_mascote', {
+      p_pair_id: pairId,
+      p_presente_id: presenteId,
+    });
+    if (error) {
+      console.error('Erro ao resgatar presente do mascotinho:', error);
+      return;
+    }
+    const linha = Array.isArray(data) ? data[0] : data;
+    estadoAtual = linha.mascote;
+    presentesPendentes = presentesPendentes.filter((p) => p.id !== presenteId);
+    render();
+    mostrarToast(
+      linha.presente.mensagem
+        ? `🎁 "${linha.presente.mensagem}"`
+        : '🎁 Presente aberto! Ela adorou a surpresa'
+    );
+  }
+
   async function init(opts) {
     supabase = opts.supabase;
     pairId = opts.pairId;
@@ -352,8 +511,9 @@ export const Mascotinho = (() => {
     if (container) {
       await carregarEstado();
       await ganharXP('login');
+      await carregarPresentesPendentes();
     }
   }
 
-  return { init, ganharXP, carinho };
+  return { init, ganharXP, carinho, deixarPresente };
 })();

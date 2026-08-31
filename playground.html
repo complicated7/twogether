@@ -173,14 +173,29 @@
   .masc-stat-value{ font-size:11px; font-weight:700; text-align:right; }
   .masc-stat-label{ font-size:11px; opacity:.65; }
 
-  .masc-acoes{ display:flex; gap:8px; }
+  .masc-streak{ margin:0 0 8px; font-family:'Baloo 2',cursive; font-weight:700; font-size:12px; color:#E3893D; }
+
+  .masc-presentes-aviso{ margin-bottom:8px; }
+  .masc-presente-btn{
+    width:100%; font-family:'Baloo 2',cursive; font-weight:700; font-size:12.5px; color:#fff;
+    background:linear-gradient(90deg,#FF8FA8,#FFA83D); border:none; padding:8px 14px; border-radius:999px;
+    cursor:pointer; box-shadow:0 4px 10px rgba(43,35,32,0.2); animation:masc-presente-pulse 1.6s ease-in-out infinite;
+  }
+  @keyframes masc-presente-pulse{ 0%,100%{ transform:scale(1); } 50%{ transform:scale(1.02); } }
+
+  .masc-acoes{ display:flex; flex-wrap:wrap; gap:6px; }
   .masc-btn-carinho{
-    width:100%; font-family:'Baloo 2',cursive; font-weight:600; font-size:13px; color:var(--ink);
-    background:#fff; border:none; padding:8px 14px; border-radius:999px; cursor:pointer;
+    flex:1 1 calc(50% - 6px); min-width:0; font-family:'Baloo 2',cursive; font-weight:600; font-size:12.5px; color:var(--ink);
+    background:#fff; border:none; padding:8px 10px; border-radius:999px; cursor:pointer;
     box-shadow:0 4px 10px rgba(43,35,32,0.16); transition:transform .15s ease;
   }
   .masc-btn-carinho:hover{ transform:translateY(-2px); }
   .masc-btn-carinho:active{ transform:translateY(0); }
+  .masc-sussurro-input{
+    width:100%; font-family:'Quicksand',sans-serif; font-size:12px; border-radius:12px;
+    border:1.4px solid rgba(43,35,32,0.16); padding:8px 10px; resize:none; height:52px; margin-bottom:6px; box-sizing:border-box;
+  }
+  .masc-sussurro-resposta{ margin:8px 0 0; font-size:11.5px; font-style:italic; opacity:.8; min-height:14px; }
 
   .masc-guarda-roupa{ margin-top:10px; border-top:1px solid rgba(43,35,32,0.12); padding-top:8px; }
   .masc-guarda-roupa summary{ cursor:pointer; font-family:'Baloo 2',cursive; font-weight:600; font-size:12.5px; list-style:none; }
@@ -214,7 +229,8 @@
     .masc-stats{ gap:4px; margin-bottom:8px; }
     .masc-stat-emoji{ font-size:11px; }
     .masc-stat-value, .masc-stat-label{ font-size:10px; }
-    .masc-btn-carinho{ font-size:12px; padding:7px 12px; }
+    .masc-btn-carinho{ font-size:11px; padding:7px 8px; }
+    .masc-sussurro-input{ font-size:11px; height:44px; }
     .masc-guarda-roupa summary{ font-size:11.5px; }
     .masc-opcao{ font-size:10px; padding:4px 8px; }
   }
